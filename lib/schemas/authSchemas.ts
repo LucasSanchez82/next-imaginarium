@@ -30,3 +30,11 @@ export const loginSchema = z.object({
     .min(6, { message: "Mot de passe doit contenir au moins 6 caracteres" })
     .describe("Mot de passe"),
 });
+
+export const sessionSchema = z.object({
+  id: z.string().min(1), //obliger de mettre id
+  email: z.string().min(3),
+  name: z.string().min(3),
+  isAdmin: z.boolean(),
+  isVerified: z.boolean(),
+});

@@ -12,6 +12,8 @@ async function main() {
       email: "admin@admin.com",
       name: "Admin",
       password,
+      isAdmin: true,
+      
     },
   });
   console.log({ user });

@@ -2,9 +2,10 @@
 CREATE TABLE `users` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
-    `email` VARCHAR(191) NULL,
-    `password` VARCHAR(191) NULL,
-    `email_verified` DATETIME(3) NULL,
+    `email` VARCHAR(191) NOT NULL,
+    `password` VARCHAR(191) NOT NULL,
+    `isAdmin` BOOLEAN NOT NULL DEFAULT false,
+    `isVerified` BOOLEAN NOT NULL,
     `image` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -16,10 +17,10 @@ CREATE TABLE `users` (
 -- CreateTable
 CREATE TABLE `accounts` (
     `id` VARCHAR(191) NOT NULL,
-    `user_id` VARCHAR(191) NOT NULL,
+    `userId` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NULL,
     `provider` VARCHAR(191) NOT NULL,
-    `provider_account_id` VARCHAR(191) NOT NULL,
+    `providerAccountId` VARCHAR(191) NOT NULL,
     `token_type` VARCHAR(191) NULL,
     `refresh_token` TEXT NULL,
     `access_token` TEXT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE `accounts` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `accounts_provider_provider_account_id_key`(`provider`, `provider_account_id`),
+    UNIQUE INDEX `accounts_provider_providerAccountId_key`(`provider`, `providerAccountId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -62,7 +63,7 @@ CREATE TABLE `VerificationRequest` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `accounts` ADD CONSTRAINT `accounts_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `accounts` ADD CONSTRAINT `accounts_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `sessions` ADD CONSTRAINT `sessions_user_id_fkey` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

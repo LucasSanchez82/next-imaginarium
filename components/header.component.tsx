@@ -6,6 +6,8 @@ import { ModeToggle } from "./modeToggle";
 
 const Header = () => {
   const { data: session } = useSession();
+  console.log(session);
+
   const user = session?.user;
 
   return (
@@ -51,6 +53,13 @@ const Header = () => {
               <li className="cursor-pointer" onClick={() => signOut()}>
                 Logout
               </li>
+              {user.isAdmin && (
+                <li>
+                  <Link href="/register" className="text-ct-dark-600">
+                    register
+                  </Link>
+                </li>
+              )}
             </>
           )}
         </ul>

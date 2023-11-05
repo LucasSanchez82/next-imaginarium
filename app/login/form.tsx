@@ -13,7 +13,7 @@ const LoginForm = () => {
   const router = useRouter();
   
   const handleSubmit = async (formValues: loginType) => {
-    const callbackUrl = searchParams.get("callbackUrl") || "/profile";
+    const callbackUrl = searchParams.get("callbackUrl") || "/profile"; // prend la route existante et rajoute /profile
     const res = await signIn("credentials", {
       redirect: false,
       email: formValues.email,
@@ -21,10 +21,12 @@ const LoginForm = () => {
       callbackUrl,
     });
     if (res?.error) {
+      console.log(res);
+      
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        title: "Erreur lors de la connection.",
+        description: "mot de passe ou email non correct.",
         //   action: <ToastAction altText="Try again">Try again</ToastAction>,
       });
     } else {
@@ -32,7 +34,6 @@ const LoginForm = () => {
     }
   };
   return (
-    <>
       <AutoForm formSchema={loginSchema} onSubmit={handleSubmit} fieldConfig={{
         password: {
           inputProps: {
@@ -42,7 +43,6 @@ const LoginForm = () => {
       }}>
         <AutoFormSubmit>Se connecter</AutoFormSubmit>
       </AutoForm>
-    </>
   );
 };
 

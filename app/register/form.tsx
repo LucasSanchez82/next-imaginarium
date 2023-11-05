@@ -47,7 +47,6 @@ const RegisterForm = () => {
   };
 
   return (
-    <>
       <AutoForm formSchema={registerSchema} onSubmit={handleSubmit} fieldConfig={{
         password: {
           inputProps: {
@@ -57,7 +56,6 @@ const RegisterForm = () => {
       }}>
         <AutoFormSubmit>Creer un compte</AutoFormSubmit>
       </AutoForm>
-    </>
   );
 };
 
