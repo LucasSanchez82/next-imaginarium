@@ -21,8 +21,6 @@ const LoginForm = () => {
       callbackUrl,
     });
     if (res?.error) {
-      console.log(res);
-      
       toast({
         variant: "destructive",
         title: "Erreur lors de la connection.",

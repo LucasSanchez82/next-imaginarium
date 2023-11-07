@@ -91,8 +91,6 @@ export const authOptions: NextAuthOptions = {
       }
     },
     session: ({ session, user, token }) => { //token recuperer ce qu a retourner jwt
-      // console.log(token);
-      console.log(session);
       const safeToken = sessionSchema.safeParse(token)
       if(safeToken.success){
         return {

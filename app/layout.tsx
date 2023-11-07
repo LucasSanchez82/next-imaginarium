@@ -1,6 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
-import "./page.module.css";
 import { NextAuthProvider } from "./providers";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header.component";
