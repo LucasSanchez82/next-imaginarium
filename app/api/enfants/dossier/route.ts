@@ -5,8 +5,7 @@ import {
   readFileSync,
   statSync,
 } from "fs";
-import { writeFile } from "fs/promises";
-import { readFile } from "fs";
+import { readFile, readdir, writeFile } from "fs/promises";
 import { getStaticPaths } from "next/dist/build/templates/pages";
 import { NextResponse } from "next/server";
 import { join } from "path";
@@ -22,11 +21,14 @@ export const POST = async (req: Request) => {
 
   const byte = await file.arrayBuffer();
   const buffer = Buffer.from(byte); //buffer = donnees temporaires
-  console.log("server Buffer", buffer.toString("base64"));
 
   const uploadDir = join("./", "upload", "dossierEnfant");
   const fullFilePath = join(uploadDir, file.name);
-  const fileNameWithoutExtension = file.name.split(".")[0].toLowerCase();
+  const fileNameWithoutExtension = file.name
+    .split(".")[0] //on prend la premiere partie avant le .
+    .toLowerCase() //tout en minuscule
+    .replace(/(?!\w|\s)./g, '') //enlever caracteres speciaux
+    .replace(/\s+/g, ""); // enlevers espace vide (espace, tab, entre...)
   const fileExtension = file.name.split(".").pop()!.toLowerCase();
 
   if (fileExtension != "pdf")
@@ -44,13 +46,13 @@ export const POST = async (req: Request) => {
       ) {
         i++;
       }
-      copyFileSync(
-        fullFilePath,
-        join(uploadDir, `${fileNameWithoutExtension}(${i}).pdf`)
-      );
+      const newFilePath = join(uploadDir, `${fileNameWithoutExtension}(${i}).pdf`);
+      writeFile(newFilePath, buffer);
+
+
     } else {
       //sinon on upload direct
-      writeFile(fullFilePath, uploadDir);
+      writeFile(fullFilePath, buffer);
     }
     // await writeFile(fullFilePath, buffer);
 
@@ -74,21 +76,20 @@ export const POST = async (req: Request) => {
 };
 
 export const GET = async (req: Request, res: Response) => {
-  const buffer = readFile(
-    "E:\\rapport code\\next-imaginarium\\upload\\dossierEnfant\\photo.pdf"
-  , 'base64', (err, data) => {
-      if(err){
-        console.log('error', err);
-        return null
-      }else {
-        console.log('data', data);
-        
-        return data
-      }
-  });
-  console.log(buffer);
+
+  const uploadDir = join("./", "upload", "dossierEnfant");
+  const readDir = await readdir(uploadDir);
+  const buffer = await readFile(join(uploadDir, readDir[10]));
   
-  const response = new NextResponse(buffer);
-  response.headers.set("content-type", "application/pdf");
-  return response;
+  
+  console.log(buffer);
+  console.log(join(uploadDir, readDir[1]));
+  
+  
+
+  return new NextResponse(buffer, {
+    headers: {
+      "Content-Type": "application/pdf",
+    },
+  });
 };

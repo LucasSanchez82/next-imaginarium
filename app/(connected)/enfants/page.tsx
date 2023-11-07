@@ -1,17 +1,16 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import React from "react";
+import AddEnfantForm from "./addEnfantForm";
+import { PrismaClient } from "@prisma/client";
 
-export default async function Enfant() {
-  const session = await getServerSession(authOptions);
-  
-  if (!session) {
-    redirect('/');
-  } else {
-    return (
-      <>
-        <h2>enfants page</h2>
-      </>
-    );
-  }
-}
+const page = async () => {
+  const prisma = new PrismaClient();
+  const enfants = await prisma.enfant.findMany()
+  return (
+    <>
+      <h1>Enfants</h1>
+      <AddEnfantForm />
+    </>
+  );
+};
+
+export default page;

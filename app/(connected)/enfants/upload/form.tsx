@@ -11,7 +11,7 @@ const Form = async () => {
     const form = event.target;
     if (form instanceof HTMLFormElement) {
       const formDatas = new FormData(form);
-      const response = await fetch("/api/user/uploadDossier", {
+      const response = await fetch("/api/enfants/dossier", {
         method: "POST",
         body: formDatas,
       });

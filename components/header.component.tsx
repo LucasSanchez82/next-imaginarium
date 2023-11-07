@@ -24,21 +24,21 @@ const Header = () => {
         <ul className="flex items-center gap-4 ">
           <li>
             <Link href="/" className="text-ct-dark-600">
-              Home
+              Accueil
             </Link>
           </li>
           {!user && (
             <>
               <li>
-                <Link href="/login" className="text-ct-dark-600">
-                  Login
+                <Link href="/se-connecter" className="text-ct-dark-600">
+                  Se connecter
                 </Link>
               </li>
-              <li>
-                <Link href="/register" className="text-ct-dark-600">
-                  Register
+              {/* <li>
+                <Link href="/creer-compte" className="text-ct-dark-600">
+                  creer compte
                 </Link>
-              </li>
+              </li> */}
             </>
           )}
           {user && (
@@ -49,14 +49,26 @@ const Header = () => {
                 </Link>
               </li>
               <li className="cursor-pointer" onClick={() => signOut()}>
-                Logout
+                Se deconnecter
               </li>
               {user.isAdmin && (
-                <li>
-                  <Link href="/register" className="text-ct-dark-600">
-                    register
-                  </Link>
-                </li>
+                <>
+                  <li>
+                    <Link href="/creer-compte" className="text-ct-dark-600">
+                      Creer compte
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/enfants" className="text-ct-dark-600">
+                      enfants
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/enfants/upload" className="text-ct-dark-600">
+                      ajouter enfant
+                    </Link>
+                  </li>
+                </>
               )}
             </>
           )}
