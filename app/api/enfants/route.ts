@@ -1,11 +1,15 @@
+import { authOptions } from "@/lib/auth";
 import { enfantSchema } from "@/types/enfantSchemas";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export const POST = async (req: Request) => {
+  const session = await getServerSession(authOptions);
+  if(!session?.user) return NextResponse.json({error: 'Erreur, l\'utilisateur doit etre connecte'}, {status: 401});
+
   const body = await req.json();
   const newBody = {...body, dateNaissance: new Date(body.dateNaissance)}
-  console.log('body', newBody);
   const safeValues = enfantSchema.safeParse(newBody);
   if (safeValues.success) {
     const datas = safeValues.data;
@@ -14,6 +18,7 @@ export const POST = async (req: Request) => {
       await prisma.enfant.create({
         data: {
           ...datas,
+          idReferent: session.user.id
         },
       });
       return NextResponse.json(
