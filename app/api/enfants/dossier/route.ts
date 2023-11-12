@@ -1,3 +1,5 @@
+import { addDocumentSchema } from "@/types/documentSchemas";
+import { PrismaClient } from "@prisma/client";
 import {
   copyFileSync,
   createReadStream,
@@ -10,9 +12,37 @@ import { getStaticPaths } from "next/dist/build/templates/pages";
 import { NextResponse } from "next/server";
 import { join } from "path";
 
+const addToDatabase = async (document: {
+  libelleDocument: string;
+  cheminDocument: string;
+  idEnfant: string;
+}) => {
+  const safeDocument = addDocumentSchema.safeParse(document);
+  if (safeDocument.success) {
+    const prisma = new PrismaClient();
+    prisma.document.create({ data: safeDocument.data });
+  }
+};
+
 export const POST = async (req: Request) => {
+  const prisma = new PrismaClient();
   const body = await req.formData();
   const file = body.get("file");
+  const idEnfant = String(body.get("idEnfant"));
+  const nbEnfants = await prisma.enfant.count({ where: { id: idEnfant } });
+
+  if (nbEnfants !== 1) {
+    return NextResponse.json(
+      {
+        error:
+          nbEnfants > 1
+            ? "Erreur critique, il y a plus de 1 enfant"
+            : "Enfant non trouvé",
+      },
+      { status: 401 }
+    );
+  }
+
   if (!(file instanceof File))
     return NextResponse.json(
       { error: "Erreur: N'est pas un fichier" },
@@ -23,15 +53,17 @@ export const POST = async (req: Request) => {
   const buffer = Buffer.from(byte); //buffer = donnees temporaires
 
   const uploadDir = join("./", "upload", "dossierEnfant");
-  const fullFilePath = join(uploadDir, file.name);
   const fileNameWithoutExtension = file.name
-    .split(".")[0] //on prend la premiere partie avant le .
-    .toLowerCase() //tout en minuscule
-    .replace(/(?!\w|\s)./g, '') //enlever caracteres speciaux
-    .replace(/\s+/g, ""); // enlevers espace vide (espace, tab, entre...)
+  .split(".")[0] //on prend la premiere partie avant le .
+  .toLowerCase() //tout en minuscule
+  .replace(/(?!\w|\s)./g, "") //enlever caracteres speciaux
+  .replace(/\s+/g, ""); // enlevers espace vide (espace, tab, entre...)
   const fileExtension = file.name.split(".").pop()!.toLowerCase();
+  let safeFileName = `${fileNameWithoutExtension}`;
 
-  if (fileExtension != "pdf")
+  let fullFilePath = join(uploadDir, safeFileName + '.pdf');
+  
+  if (fileExtension != "pdf" || file.type != "application/pdf")
     return NextResponse.json(
       { error: "ce 'est pas un fichier pdf" },
       { status: 401 }
@@ -46,15 +78,21 @@ export const POST = async (req: Request) => {
       ) {
         i++;
       }
-      const newFilePath = join(uploadDir, `${fileNameWithoutExtension}(${i}).pdf`);
-      writeFile(newFilePath, buffer);
-
-
+      safeFileName = `${fileNameWithoutExtension}(${i})`;
+      fullFilePath = join(uploadDir, safeFileName + '.pdf');
+      writeFile(fullFilePath, buffer);
     } else {
       //sinon on upload direct
       writeFile(fullFilePath, buffer);
     }
-    // await writeFile(fullFilePath, buffer);
+
+    await prisma.document.create({
+      data: {
+        idEnfant,
+        cheminDocument: fullFilePath,
+        libelleDocument: safeFileName,
+      },
+    });
 
     return NextResponse.json(
       {
@@ -76,16 +114,12 @@ export const POST = async (req: Request) => {
 };
 
 export const GET = async (req: Request, res: Response) => {
-
   const uploadDir = join("./", "upload", "dossierEnfant");
   const readDir = await readdir(uploadDir);
   const buffer = await readFile(join(uploadDir, readDir[10]));
-  
-  
+
   console.log(buffer);
   console.log(join(uploadDir, readDir[1]));
-  
-  
 
   return new NextResponse(buffer, {
     headers: {

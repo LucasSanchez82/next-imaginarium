@@ -1,6 +1,7 @@
 import React from "react";
 import AddEnfantForm from "./addEnfantForm";
 import { PrismaClient } from "@prisma/client";
+import { DialogAddEnfantForm } from "./dialogAddEnfantForm";
 
 const page = async () => {
   const prisma = new PrismaClient();
@@ -8,7 +9,8 @@ const page = async () => {
   return (
     <>
       <h1>Enfants</h1>
-      <AddEnfantForm />
+      {/* <AddEnfantForm /> */}
+      <DialogAddEnfantForm />
     </>
   );
 };

@@ -7,25 +7,31 @@ export const GET = async (
   request: NextRequest,
   { params }: { params: { filename: string } }
 ) => {
-  const filename = params.filename;
+  try {
+    const filename = params.filename;
 
-  const uploadDir = join("./", "upload", "dossierEnfant");
-  const readDir = await readdir(uploadDir);
-  const isExist = readDir.includes(filename + '.pdf');
-  if(isExist){
-    console.log(readDir);
-    
-    console.log(join(uploadDir, readDir[6]));
-    
-      const buffer = await readFile(join(uploadDir, readDir[0]));
+    const uploadDir = join("./", "upload", "dossierEnfant");
+    const readDir = await readdir(uploadDir);
+    const isExist = readDir.includes(filename + '.pdf');
+    if (isExist) {
+      console.log(readDir);
+
+      console.log(join(uploadDir, filename + '.pdf'));
+
+      const buffer = await readFile(join(uploadDir, filename + '.pdf'));
       console.log(join("./", ".."));
-    
+
       return new NextResponse(buffer, {
         headers: {
           "Content-Type": "application/pdf",
         },
       });
-  }else {
-    return NextResponse.json('Erreur 404: fichier non trouvé',{status: 500})
+    } else {
+      return NextResponse.json("Erreur 404: fichier non trouvé", {
+        status: 500,
+      });
+    }
+  } catch (error) {
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 };

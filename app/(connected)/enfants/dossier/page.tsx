@@ -1,14 +1,14 @@
-import { readdir } from 'fs/promises';
-import { join } from 'path';
-import React from 'react';
+import React from "react";
+import Form from "./form";
+const page = () => {
+    
 
-const page = async () => {
-    const readDir = await readdir(join('./', 'upload/dossierEnfant'));
-    return (
-        <div>
-            {readDir.map((el, key) => <li key={key}>{el}</li> )}
-        </div>
-    );
+  return (
+    <>
+      <h1>Upload</h1>
+      {/* <Form idEnfant= /> */}
+    </>
+  );
 };
 
 export default page;

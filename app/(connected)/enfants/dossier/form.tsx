@@ -1,32 +1,37 @@
 "use client";
-import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
+import { PrismaClient } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-const Form = async () => {
+const Form = async ({ idEnfant }: { idEnfant: string }) => {
+  const router = useRouter();
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     const form = event.target;
     if (form instanceof HTMLFormElement) {
       const formDatas = new FormData(form);
+      formDatas.append("idEnfant", idEnfant);
+
       const response = await fetch("/api/enfants/dossier", {
         method: "POST",
         body: formDatas,
       });
       const res = await response.json();
+
       if (response.ok) {
         toast({
           variant: "default",
-          title: res.message || 'Image telecharge avec succes',
+          title: res.message || "Image telecharge avec succes",
         });
+        router.refresh();
       } else {
         toast({
           variant: "destructive",
           title: "Erreur lors du telechargement",
           description: res.error || "",
-          //   action: <ToastAction altText="Try again">Try again</ToastAction>,
         });
       }
     }

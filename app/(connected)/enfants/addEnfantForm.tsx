@@ -3,9 +3,9 @@ import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { toast } from "@/components/ui/use-toast";
 import { addEnfantSchema, enfantSchema } from "@/types/enfantSchemas";
 import { addEnfantType, enfantType } from "@/types/enfantType";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
-const AddEnfantForm = () => {
+const AddEnfantForm = ({setOpen}: {setOpen: Dispatch<SetStateAction<boolean>>}) => {
   const handleSubmit = async (values: addEnfantType) => {
     const [day, month, year] = values.dateNaissance.split("/");
     const date = new Date(`${year}-${month}-${day}`);
@@ -22,6 +22,7 @@ const AddEnfantForm = () => {
       })
       const res = await response.json();
       if(response.ok){
+        setOpen(false);
         toast({
           variant: 'default',
           title: res.success || 'Enfant ajouté'
