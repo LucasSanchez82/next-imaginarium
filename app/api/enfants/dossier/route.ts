@@ -54,15 +54,15 @@ export const POST = async (req: Request) => {
 
   const uploadDir = join("./", "upload", "dossierEnfant");
   const fileNameWithoutExtension = file.name
-  .split(".")[0] //on prend la premiere partie avant le .
-  .toLowerCase() //tout en minuscule
-  .replace(/(?!\w|\s)./g, "") //enlever caracteres speciaux
-  .replace(/\s+/g, ""); // enlevers espace vide (espace, tab, entre...)
+    .split(".")[0] //on prend la premiere partie avant le .
+    .toLowerCase() //tout en minuscule
+    .replace(/(?!\w|\s)./g, "") //enlever caracteres speciaux
+    .replace(/\s+/g, ""); // enlevers espace vide (espace, tab, entre...)
   const fileExtension = file.name.split(".").pop()!.toLowerCase();
   let safeFileName = `${fileNameWithoutExtension}`;
 
-  let fullFilePath = join(uploadDir, safeFileName + '.pdf');
-  
+  let fullFilePath = join(uploadDir, safeFileName + ".pdf");
+
   if (fileExtension != "pdf" || file.type != "application/pdf")
     return NextResponse.json(
       { error: "ce 'est pas un fichier pdf" },
@@ -79,7 +79,7 @@ export const POST = async (req: Request) => {
         i++;
       }
       safeFileName = `${fileNameWithoutExtension}(${i})`;
-      fullFilePath = join(uploadDir, safeFileName + '.pdf');
+      fullFilePath = join(uploadDir, safeFileName + ".pdf");
       writeFile(fullFilePath, buffer);
     } else {
       //sinon on upload direct
