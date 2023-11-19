@@ -1,87 +1,109 @@
+"use client";
+import PreviousNextBar from "@/app/(connected)/enfants/previousNextBar";
+import SearchBar from "@/app/(connected)/enfants/searchEnfantBar";
 import {
   Table,
   TableBody,
   TableCaption,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import { getEnfant } from "@/types/enfantType";
+import { useEffect, useState } from "react";
+import { getSpecificEnfants } from "./actions/enfant";
 
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-]
+export function TableEnfant({
+  enfants,
+  limit: initialLimit,
+  nbPages: initialNbPages,
+}: {
+  enfants: getEnfant[];
+  limit: { skip: number; take: number };
+  nbPages: number;
+}) {
+  const [newEnfants, setNewEnfants] = useState<getEnfant[]>(enfants);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [limit, setLimit] = useState(initialLimit);
+  const [nbPages, setNbPages] = useState(initialNbPages);
+  const [searchEnfant, setSearchEnfant] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
-export function TableDemo() {
+  const reloadVisibleEnfants = async (refreshNbPages = false) => {
+    //s'occupe d'actualiser le tableau d'enfants
+
+    setIsLoading(true);
+    const { enfants, nbPages } = (await getSpecificEnfants(
+      String(searchEnfant),
+      limit,
+      refreshNbPages
+    )) as  // mauvais pratique mais pour le coup on est sur d'etre authentifie et sinon c'est complique pour rien a gerer
+      | {
+          enfants: getEnfant[];
+          nbPages: number;
+        }
+      | {
+          enfants: getEnfant[];
+          nbPages?: undefined;
+        };
+
+    if (nbPages) setNbPages(nbPages);
+    setNewEnfants(enfants);
+
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (isMounted) {
+      //ca ne sert a rien de le lancer au chargement
+      console.log("lancement du useeffect");
+      reloadVisibleEnfants();
+    } else {
+      setIsMounted(true);
+    }
+  }, [limit]);
+
   return (
-    <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Invoice</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.invoice}>
-            <TableCell className="font-medium">{invoice.invoice}</TableCell>
-            <TableCell>{invoice.paymentStatus}</TableCell>
-            <TableCell>{invoice.paymentMethod}</TableCell>
-            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+    <>
+      <SearchBar
+        useEnfant={{ searchEnfant, setSearchEnfant }}
+        useLoading={{ isLoading, setIsLoading }}
+        reloadVisibleEnfants={reloadVisibleEnfants}
+        useNbPages={{ nbPages, setNbPages }}
+      />
+      <Table>
+        <TableCaption>Liste des enfants</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>nom</TableHead>
+            <TableHead>prenom</TableHead>
+            <TableHead>telephone</TableHead>
+            <TableHead>email</TableHead>
+            <TableHead>dateNaissance</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-      {/* <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter> */}
-    </Table>
-  )
+        </TableHeader>
+        {
+          <TableBody>
+            {newEnfants.map((enfant) => (
+              <TableRow key={enfant.id}>
+                <TableCell>{enfant.nom}</TableCell>
+                <TableCell>{enfant.prenom}</TableCell>
+                <TableCell>{enfant.telephone}</TableCell>
+                <TableCell>{enfant.email}</TableCell>
+                <TableCell>{enfant.dateNaissance.getFullYear()}</TableCell>
+              </TableRow>
+            ))}
+
+            <PreviousNextBar
+              setLimit={setLimit}
+              colSpan={5}
+              limit={limit}
+              nbPages={nbPages}
+            />
+          </TableBody>
+        }
+      </Table>
+    </>
+  );
 }

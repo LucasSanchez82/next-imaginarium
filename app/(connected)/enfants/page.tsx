@@ -1,17 +1,19 @@
-import React from "react";
-import AddEnfantForm from "./addEnfantForm";
+import { TableEnfant } from "@/components/dataTableComponent";
 import { PrismaClient } from "@prisma/client";
 import { DialogAddEnfantForm } from "./dialogAddEnfantForm";
-import { TableDemo } from "@/components/dataTableComponent";
 
 const page = async () => {
   const prisma = new PrismaClient();
-  const enfants = await prisma.enfant.findMany()
+  const limit = {skip: 0, take: 10};
+  const enfants = await prisma.enfant.findMany({ take: limit.take });
+  const enfantsCount = await prisma.enfant.count();
+  const nbPages = Math.ceil(enfantsCount / limit.take);
+
   return (
     <>
       <h1>Enfants</h1>
       <DialogAddEnfantForm />
-      <TableDemo />
+      <TableEnfant enfants={enfants} limit={limit} nbPages={nbPages} />
     </>
   );
 };
