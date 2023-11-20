@@ -1,25 +1,23 @@
 "use client";
+import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import AddEnfantForm from "./addEnfantForm";
-import { useState } from "react";
-import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { toast } from "@/components/ui/use-toast";
 import { addEnfantSchema, enfantSchema } from "@/types/enfantSchemas";
 import { addEnfantType, enfantType } from "@/types/enfantType";
-import React, { Dispatch, SetStateAction } from "react";
-export function DialogAddEnfantForm() {
+import { useState } from "react";
+export function DialogAddEnfantForm({
+  reloadVisibleEnfants,
+}: {
+  reloadVisibleEnfants: (refreshNbPages?: boolean) => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
+
   const handleSubmit = async (values: addEnfantType) => {
     const [day, month, year] = values.dateNaissance.split("/");
     const date = new Date(`${year}-${month}-${day}`);
@@ -37,6 +35,7 @@ export function DialogAddEnfantForm() {
       const res = await response.json();
       if (response.ok) {
         setOpen(false);
+        await reloadVisibleEnfants();
         toast({
           variant: "default",
           title: res.success || "Enfant ajouté",

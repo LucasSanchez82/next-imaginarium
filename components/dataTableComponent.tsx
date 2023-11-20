@@ -13,6 +13,8 @@ import {
 import { getEnfant } from "@/types/enfantType";
 import { useEffect, useState } from "react";
 import { getSpecificEnfants } from "./actions/enfant";
+import Link from "next/link";
+import { DialogAddEnfantForm } from "@/app/(connected)/enfants/dialogAddEnfantForm";
 
 export function TableEnfant({
   enfants,
@@ -66,6 +68,7 @@ export function TableEnfant({
 
   return (
     <>
+      <DialogAddEnfantForm reloadVisibleEnfants={reloadVisibleEnfants} />
       <SearchBar
         useEnfant={{ searchEnfant, setSearchEnfant }}
         useLoading={{ isLoading, setIsLoading }}
@@ -81,6 +84,7 @@ export function TableEnfant({
             <TableHead>telephone</TableHead>
             <TableHead>email</TableHead>
             <TableHead>dateNaissance</TableHead>
+            <TableHead>documents</TableHead>
           </TableRow>
         </TableHeader>
         {
@@ -92,6 +96,14 @@ export function TableEnfant({
                 <TableCell>{enfant.telephone}</TableCell>
                 <TableCell>{enfant.email}</TableCell>
                 <TableCell>{enfant.dateNaissance.getFullYear()}</TableCell>
+                <TableCell>
+                  <Link
+                    className="underline rounded p-1 bg-secondary"
+                    href={"/enfants/dossier/" + enfant.id}
+                  >
+                    dossier
+                  </Link>{" "}
+                </TableCell>
               </TableRow>
             ))}
 

@@ -35,7 +35,7 @@ export const getSpecificEnfants = async (
           ],
         },
       };
-      enfants = await prisma.enfant.findMany({ ...options, ...limit });
+      enfants = await prisma.enfant.findMany({ ...options, ...limit, orderBy: { id: "desc" } });
       if (refreshPages) nbEnfants = await prisma.enfant.count(options);
     } else if (names.length === 1) {
       //chercher Jhon ou Doe
@@ -52,7 +52,7 @@ export const getSpecificEnfants = async (
           ],
         },
       };
-      enfants = await prisma.enfant.findMany({ ...options, ...limit });
+        enfants = await prisma.enfant.findMany({ ...options, ...limit, orderBy: { id: "desc" }});
       if (refreshPages) nbEnfants = await prisma.enfant.count(options);
     }
 
