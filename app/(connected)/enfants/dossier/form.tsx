@@ -2,11 +2,10 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
-import { PrismaClient } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const Form = async ({ idEnfant }: { idEnfant: string }) => {
+const Form = ({ idEnfant }: { idEnfant: string }) => {
   const router = useRouter();
   const handleSubmit = async (event: React.SyntheticEvent) => {
     event.preventDefault();

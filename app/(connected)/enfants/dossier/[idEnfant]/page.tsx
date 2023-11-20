@@ -1,8 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { NextRequest } from "next/server";
-import React from "react";
-import Form from "../form";
 import Link from "next/link";
+import Form from "../form";
 
 const page = async ({ params }: { params: { idEnfant: string } }) => {
   const prisma = new PrismaClient();
@@ -23,8 +21,8 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
         <Form idEnfant={params.idEnfant} />
         {document.length > 0 ? (
           <ul>
-            {document.map((el) => (
-              <li>
+            {document.map((el, key) => (
+              <li key={key}>
                 <Link target="_blank" href={"/api/enfants/dossier/" + el.libelleDocument}>
                 {el.libelleDocument}
                 </Link>
