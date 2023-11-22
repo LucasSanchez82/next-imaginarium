@@ -8,7 +8,24 @@ import { getServerSession } from "next-auth";
 export const getSpecificEnfants = async (
   searchEnfant: string,
   limit: { skip: number; take: number },
-  refreshPages = false
+  refreshPages = false,
+  configRequestPrisma: {
+    select: {
+      referent: {
+        select: {
+          email: boolean;
+        };
+      };
+      id: boolean;
+      dateNaissance: boolean;
+      idReferent: boolean;
+      email: boolean;
+      telephone: boolean;
+      nom: boolean;
+      prenom: boolean;
+      _count: boolean;
+    };
+  }
 ) => {
   const session = await getServerSession(authOptions);
   if (session?.user) {
@@ -34,9 +51,14 @@ export const getSpecificEnfants = async (
             },
           ],
         },
+        ...configRequestPrisma
       };
-      enfants = await prisma.enfant.findMany({ ...options, ...limit, orderBy: { id: "desc" } });
-      if (refreshPages) nbEnfants = await prisma.enfant.count(options);
+      enfants = await prisma.enfant.findMany({
+        ...options,
+        ...limit,
+        orderBy: { id: "desc" },
+      });
+      if (refreshPages) nbEnfants = await prisma.enfant.count({where : options.where});
     } else if (names.length === 1) {
       //chercher Jhon ou Doe
       const name = names[0];
@@ -51,9 +73,14 @@ export const getSpecificEnfants = async (
             },
           ],
         },
+        ...configRequestPrisma
       };
-        enfants = await prisma.enfant.findMany({ ...options, ...limit, orderBy: { id: "desc" }});
-      if (refreshPages) nbEnfants = await prisma.enfant.count(options);
+      enfants = await prisma.enfant.findMany({
+        ...options,
+        ...limit,
+        orderBy: { id: "desc" },
+      });
+      if (refreshPages) nbEnfants = await prisma.enfant.count({where : options.where});
     }
 
     if (refreshPages) {
@@ -67,9 +94,3 @@ export const getSpecificEnfants = async (
   }
 };
 
-export const getAllEnfants = async () => {
-  const prisma = new PrismaClient();
-
-  const enfants: getEnfant[] = await prisma.enfant.findMany();
-  return enfants;
-};

@@ -22,4 +22,11 @@ export type getEnfant = {
   email: string | null;
   dateNaissance: Date;
   idReferent: string;
+  referent: {
+    email: string;
+  };
+  _count: {
+    document: number;
+    referent: number;
+  };
 };

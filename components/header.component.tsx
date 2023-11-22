@@ -34,11 +34,6 @@ const Header = () => {
                   Se connecter
                 </Link>
               </li>
-              {/* <li>
-                <Link href="/creer-compte" className="text-ct-dark-600">
-                  creer compte
-                </Link>
-              </li> */}
             </>
           )}
           {user && (
@@ -61,11 +56,6 @@ const Header = () => {
                   <li>
                     <Link href="/enfants" className="text-ct-dark-600">
                       enfants
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/enfants/upload" className="text-ct-dark-600">
-                      ajouter enfant
                     </Link>
                   </li>
                 </>

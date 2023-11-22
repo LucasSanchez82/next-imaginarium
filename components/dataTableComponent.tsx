@@ -1,4 +1,5 @@
 "use client";
+import { DialogAddEnfantForm } from "@/app/(connected)/enfants/dialogAddEnfantForm";
 import PreviousNextBar from "@/app/(connected)/enfants/previousNextBar";
 import SearchBar from "@/app/(connected)/enfants/searchEnfantBar";
 import {
@@ -11,19 +12,36 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getEnfant } from "@/types/enfantType";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSpecificEnfants } from "./actions/enfant";
-import Link from "next/link";
-import { DialogAddEnfantForm } from "@/app/(connected)/enfants/dialogAddEnfantForm";
 
 export function TableEnfant({
   enfants,
   limit: initialLimit,
   nbPages: initialNbPages,
+  configRequestPrisma
 }: {
   enfants: getEnfant[];
   limit: { skip: number; take: number };
   nbPages: number;
+  configRequestPrisma: {
+    select: {
+      referent: {
+        select: {
+          email: boolean;
+        };
+      };
+      id: boolean;
+      dateNaissance: boolean;
+      idReferent: boolean;
+      email: boolean;
+      telephone: boolean;
+      nom: boolean;
+      prenom: boolean;
+      _count: boolean;
+    };
+  };
 }) {
   const [newEnfants, setNewEnfants] = useState<getEnfant[]>(enfants);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -39,7 +57,8 @@ export function TableEnfant({
     const { enfants, nbPages } = (await getSpecificEnfants(
       String(searchEnfant),
       limit,
-      refreshNbPages
+      refreshNbPages,
+      configRequestPrisma
     )) as  // mauvais pratique mais pour le coup on est sur d'etre authentifie et sinon c'est complique pour rien a gerer
       | {
           enfants: getEnfant[];
@@ -85,6 +104,7 @@ export function TableEnfant({
             <TableHead>email</TableHead>
             <TableHead>dateNaissance</TableHead>
             <TableHead>documents</TableHead>
+            <TableHead>referent</TableHead>
           </TableRow>
         </TableHeader>
         {
@@ -101,8 +121,11 @@ export function TableEnfant({
                     className="underline rounded p-1 bg-secondary"
                     href={"/enfants/dossier/" + enfant.id}
                   >
-                    dossier
+                    dossier({enfant._count.document})
                   </Link>{" "}
+                </TableCell>
+                <TableCell>
+                  {enfant.referent.email}
                 </TableCell>
               </TableRow>
             ))}
