@@ -22,11 +22,35 @@ export type getEnfant = {
   email: string | null;
   dateNaissance: Date;
   idReferent: string;
+  semaine: {
+    id: string;
+  }[];
   referent: {
     email: string;
   };
   _count: {
     document: number;
-    referent: number;
+    semaine: number;
+  };
+};
+
+export type configRequestEnfantPrismaType = {
+  select: {
+    id: true;
+    dateNaissance: true;
+    idReferent: true;
+    email: true;
+    telephone: true;
+    nom: true;
+    prenom: true;
+    _count: { select: { document: true; semaine: true} };
+    referent: {
+      select: {
+        email: true;
+      };
+    };
+    semaine: {
+      select: { id: true };
+    };
   };
 };

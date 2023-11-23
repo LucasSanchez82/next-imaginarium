@@ -1,12 +1,12 @@
 import { TableEnfant } from "@/components/dataTableComponent";
+import { configRequestEnfantPrismaType } from "@/types/enfantType";
 import { PrismaClient } from "@prisma/client";
 
 const page = async () => {
   const prisma = new PrismaClient();
   const limit = { skip: 0, take: 10 };
-  const configRequestPrisma = {
+  const configRequestPrisma: configRequestEnfantPrismaType = {
     select: {
-      referent: { select: { email: true } },
       id: true,
       dateNaissance: true,
       idReferent: true,
@@ -14,13 +14,15 @@ const page = async () => {
       telephone: true,
       nom: true,
       prenom: true,
-      _count: true,
+      _count: { select: { document: true, semaine: true } },
+      referent: { select: { email: true } },
+      semaine: { select: { id: true } },
     },
   };
   const enfants = await prisma.enfant.findMany({
     take: limit.take,
     orderBy: { id: "desc" },
-    ...configRequestPrisma
+    ...configRequestPrisma,
   });
   console.log(enfants[0]);
 
@@ -29,7 +31,12 @@ const page = async () => {
 
   return (
     <>
-      <TableEnfant configRequestPrisma={configRequestPrisma} enfants={enfants} limit={limit} nbPages={nbPages} />
+      <TableEnfant
+        configRequestPrisma={configRequestPrisma}
+        enfants={enfants}
+        limit={limit}
+        nbPages={nbPages}
+      />
     </>
   );
 };

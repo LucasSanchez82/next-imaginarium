@@ -34,7 +34,9 @@ model Enfant {
   email         String?
   dateNaissance DateTime
   idReferent String
+  
   document   Document[]
+  semaine    EmploiDuTempsSemaine[]
   referent      User @relation(fields: [idReferent], references: [id])
 }
 
@@ -45,3 +47,32 @@ model Document {
   idEnfant        String
   enfant          Enfant @relation(fields: [idEnfant], references: [id])
 }
+
+
+model EmploiDuTempsSemaine {
+  id       String          @id @default(cuid())
+  semaine  Int
+  idEnfant String
+  enfant   Enfant          @relation(fields: [idEnfant], references: [id])
+
+  jours    Jour[]          // Relation avec les jours de la semaine
+}
+
+model Jour {
+  id                 String                @id @default(cuid())
+  nom                String
+  idEmploiDuTempsSemaine String
+  emploiDuTempsSemaine EmploiDuTempsSemaine @relation(fields: [idEmploiDuTempsSemaine], references: [id])
+
+  sequencesJournee SequenceJournee[]       // Relation avec les séquences de la journée
+}
+
+model SequenceJournee {
+  id         String      @id @default(cuid())
+  heureDebut DateTime
+  heureFin   DateTime
+  idJour     String
+  jour       Jour        @relation(fields: [idJour], references: [id])
+}
+
+// ...

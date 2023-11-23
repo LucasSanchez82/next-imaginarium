@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getEnfant } from "@/types/enfantType";
+import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getSpecificEnfants } from "./actions/enfant";
@@ -20,28 +20,12 @@ export function TableEnfant({
   enfants,
   limit: initialLimit,
   nbPages: initialNbPages,
-  configRequestPrisma
+  configRequestPrisma,
 }: {
   enfants: getEnfant[];
   limit: { skip: number; take: number };
   nbPages: number;
-  configRequestPrisma: {
-    select: {
-      referent: {
-        select: {
-          email: boolean;
-        };
-      };
-      id: boolean;
-      dateNaissance: boolean;
-      idReferent: boolean;
-      email: boolean;
-      telephone: boolean;
-      nom: boolean;
-      prenom: boolean;
-      _count: boolean;
-    };
-  };
+  configRequestPrisma: configRequestEnfantPrismaType;
 }) {
   const [newEnfants, setNewEnfants] = useState<getEnfant[]>(enfants);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -105,6 +89,7 @@ export function TableEnfant({
             <TableHead>dateNaissance</TableHead>
             <TableHead>documents</TableHead>
             <TableHead>referent</TableHead>
+            <TableHead>emploi du temps</TableHead>
           </TableRow>
         </TableHeader>
         {
@@ -122,10 +107,16 @@ export function TableEnfant({
                     href={"/enfants/dossier/" + enfant.id}
                   >
                     dossier({enfant._count.document})
-                  </Link>{" "}
+                  </Link>
                 </TableCell>
+                <TableCell>{enfant.referent.email}</TableCell>
                 <TableCell>
-                  {enfant.referent.email}
+                  <Link
+                    className="underline rounded p-1 bg-secondary"
+                    href={"/enfants/dossier/" + enfant.id}
+                  >
+                    Semaines({enfant._count.semaine})
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

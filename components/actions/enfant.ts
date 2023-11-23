@@ -1,7 +1,7 @@
 "use server";
 
 import { authOptions } from "@/lib/auth";
-import { getEnfant } from "@/types/enfantType";
+import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
@@ -9,23 +9,7 @@ export const getSpecificEnfants = async (
   searchEnfant: string,
   limit: { skip: number; take: number },
   refreshPages = false,
-  configRequestPrisma: {
-    select: {
-      referent: {
-        select: {
-          email: boolean;
-        };
-      };
-      id: boolean;
-      dateNaissance: boolean;
-      idReferent: boolean;
-      email: boolean;
-      telephone: boolean;
-      nom: boolean;
-      prenom: boolean;
-      _count: boolean;
-    };
-  }
+  configRequestPrisma: configRequestEnfantPrismaType
 ) => {
   const session = await getServerSession(authOptions);
   if (session?.user) {
