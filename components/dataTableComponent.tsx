@@ -104,7 +104,7 @@ export function TableEnfant({
                 <TableCell>
                   <Link
                     className="underline rounded p-1 bg-secondary"
-                    href={"/enfants/dossier/" + enfant.id}
+                    href={"/enfants/" + enfant.id + "/dossier"}
                   >
                     dossier({enfant._count.document})
                   </Link>
@@ -113,9 +113,9 @@ export function TableEnfant({
                 <TableCell>
                   <Link
                     className="underline rounded p-1 bg-secondary"
-                    href={"/enfants/dossier/" + enfant.id}
+                    href={"/enfants/" + enfant.id + "/dossier"}
                   >
-                    Semaines({enfant._count.semaine})
+                    Semaines({enfant._count.edtSemaine})
                   </Link>
                 </TableCell>
               </TableRow>

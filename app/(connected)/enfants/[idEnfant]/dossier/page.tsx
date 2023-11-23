@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import Form from "../form";
+import Form from "./form";
 
 const page = async ({ params }: { params: { idEnfant: string } }) => {
   const prisma = new PrismaClient();

@@ -22,7 +22,7 @@ export type getEnfant = {
   email: string | null;
   dateNaissance: Date;
   idReferent: string;
-  semaine: {
+  edtSemaine: {
     id: string;
   }[];
   referent: {
@@ -30,7 +30,7 @@ export type getEnfant = {
   };
   _count: {
     document: number;
-    semaine: number;
+    edtSemaine: number;
   };
 };
 
@@ -43,13 +43,13 @@ export type configRequestEnfantPrismaType = {
     telephone: true;
     nom: true;
     prenom: true;
-    _count: { select: { document: true; semaine: true} };
+    _count: { select: { document: true; edtSemaine: true } };
     referent: {
       select: {
         email: true;
       };
     };
-    semaine: {
+    edtSemaine: {
       select: { id: true };
     };
   };

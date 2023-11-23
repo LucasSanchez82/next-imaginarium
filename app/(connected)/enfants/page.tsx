@@ -14,15 +14,15 @@ const page = async () => {
       telephone: true,
       nom: true,
       prenom: true,
-      _count: { select: { document: true, semaine: true } },
+      _count: { select: { document: true, edtSemaine: true } },
       referent: { select: { email: true } },
-      semaine: { select: { id: true } },
-    },
+      edtSemaine: { select: { id: true } },
+  }
   };
   const enfants = await prisma.enfant.findMany({
     take: limit.take,
     orderBy: { id: "desc" },
-    ...configRequestPrisma,
+    ...configRequestPrisma
   });
   console.log(enfants[0]);
 
