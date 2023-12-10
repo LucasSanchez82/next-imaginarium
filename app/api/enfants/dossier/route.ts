@@ -27,7 +27,9 @@ const addToDatabase = async (document: {
 export const POST = async (req: Request) => {
   const prisma = new PrismaClient();
   const body = await req.formData();
-  const file = body.get("file");
+  const file = body.get("file") as File;
+  console.log();
+  
   const idEnfant = String(body.get("idEnfant"));
   const nbEnfants = await prisma.enfant.count({ where: { id: idEnfant } });
 
@@ -43,7 +45,7 @@ export const POST = async (req: Request) => {
     );
   }
 
-  if (!(file instanceof File))
+  if (!(file.constructor.name === "File"))
     return NextResponse.json(
       { error: "Erreur: N'est pas un fichier" },
       { status: 500 }
