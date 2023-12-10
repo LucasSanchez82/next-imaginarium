@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
 import Form from "./form";
+import { prisma } from '@/lib/utils';
 
 const page = async ({ params }: { params: { idEnfant: string } }) => {
-  const prisma = new PrismaClient();
   const enfantEtDocuments = await prisma.enfant.findUnique({
     select: {
       nom: true,

@@ -1,8 +1,8 @@
 "use server";
 
 import { authOptions } from "@/lib/auth";
+import { prisma } from '@/lib/utils';
 import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
 export const getSpecificEnfants = async (
@@ -13,7 +13,6 @@ export const getSpecificEnfants = async (
 ) => {
   const session = await getServerSession(authOptions);
   if (session?.user) {
-    const prisma = new PrismaClient();
     const names = searchEnfant.split(" ");
 
     let enfants: getEnfant[] = [];
@@ -70,11 +69,9 @@ export const getSpecificEnfants = async (
     if (refreshPages) {
       const nbPages = Math.ceil(nbEnfants / (limit.take - limit.skip));
       return { enfants, nbPages };
-    } else {
-      console.log("😭😭");
-      console.log(refreshPages);
+    }else {
+      return { enfants };
     }
-    return { enfants };
   }
 };
 

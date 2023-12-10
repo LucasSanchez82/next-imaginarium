@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/utils";
 import { enfantSchema } from "@/types/enfantSchemas";
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -14,7 +14,6 @@ export const POST = async (req: Request) => {
   if (safeValues.success) {
     const datas = safeValues.data;
     try {
-      const prisma = new PrismaClient();
       await prisma.enfant.create({
         data: {
           ...datas,

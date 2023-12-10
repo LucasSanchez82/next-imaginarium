@@ -2,6 +2,9 @@ import { type ClassValue, clsx } from "clsx";
 import { getServerSession } from "next-auth";
 import { twMerge } from "tailwind-merge";
 import { authOptions } from "./auth";
+import { PrismaClient } from "@prisma/client";
+
+export const prisma = new PrismaClient();
 
 export type flashDataType = {isError: boolean, message: string};
 

@@ -1,9 +1,7 @@
 import { TableEnfant } from "@/components/dataTableComponent";
+import { prisma } from '@/lib/utils';
 import { configRequestEnfantPrismaType } from "@/types/enfantType";
-import { PrismaClient } from "@prisma/client";
-
 const page = async () => {
-  const prisma = new PrismaClient();
   const limit = { skip: 0, take: 10 };
   const configRequestPrisma: configRequestEnfantPrismaType = {
     select: {
@@ -17,12 +15,12 @@ const page = async () => {
       _count: { select: { document: true, edtSemaine: true } },
       referent: { select: { email: true } },
       edtSemaine: { select: { id: true } },
-  }
+    },
   };
   const enfants = await prisma.enfant.findMany({
     take: limit.take,
     orderBy: { id: "desc" },
-    ...configRequestPrisma
+    ...configRequestPrisma,
   });
   console.log(enfants[0]);
 

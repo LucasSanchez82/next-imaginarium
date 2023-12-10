@@ -1,14 +1,9 @@
+import { prisma } from "@/lib/utils";
 import { addDocumentSchema } from "@/types/documentSchemas";
-import { PrismaClient } from "@prisma/client";
 import {
-  copyFileSync,
-  createReadStream,
-  existsSync,
-  readFileSync,
-  statSync,
+  existsSync
 } from "fs";
 import { readFile, readdir, writeFile } from "fs/promises";
-import { getStaticPaths } from "next/dist/build/templates/pages";
 import { NextResponse } from "next/server";
 import { join } from "path";
 
@@ -19,13 +14,11 @@ const addToDatabase = async (document: {
 }) => {
   const safeDocument = addDocumentSchema.safeParse(document);
   if (safeDocument.success) {
-    const prisma = new PrismaClient();
     prisma.document.create({ data: safeDocument.data });
   }
 };
 
 export const POST = async (req: Request) => {
-  const prisma = new PrismaClient();
   const body = await req.formData();
   const file = body.get("file");
   const idEnfant = String(body.get("idEnfant"));

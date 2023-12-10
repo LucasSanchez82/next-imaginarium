@@ -123,7 +123,7 @@ export function TableEnfant({
 
             <PreviousNextBar
               setLimit={setLimit}
-              colSpan={5}
+              colSpan={8}
               limit={limit}
               nbPages={nbPages}
             />
