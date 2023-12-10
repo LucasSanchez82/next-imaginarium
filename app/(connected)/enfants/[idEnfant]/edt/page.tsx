@@ -14,19 +14,22 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
   if (enfantEtSemaines) {
     const { edtSemaine, nom, prenom } = enfantEtSemaines;
     return (
+      // <>
+      //   {/* <Form idEnfant={params.idEnfant} /> */}
+      //   {edtSemaine.length > 0 ? (
+      //     <ul>
+      //       {edtSemaine.map((el, key) => (
+      //         <li key={key}>{new Date(el.semaine).toString()}</li>
+      //       ))}
+      //     </ul>
+      //   ) : (
+      //     <h3 className="bg-red-400 font-bold rounded w-3/4 m-auto text-center">
+      //       Aucune semaine trouvé pour {nom} {prenom}
+      //     </h3>
+      //   )}
+      // </>
       <>
-        {/* <Form idEnfant={params.idEnfant} /> */}
-        {edtSemaine.length > 0 ? (
-          <ul>
-            {edtSemaine.map((el, key) => (
-              <li key={key}>{new Date(el.semaine).toString()}</li>
-            ))}
-          </ul>
-        ) : (
-          <h3 className="bg-red-400 font-bold rounded w-3/4 m-auto text-center">
-            Aucune semaine trouvé pour {nom} {prenom}
-          </h3>
-        )}
+        <h1>hello schedule</h1>
       </>
     );
   } else {

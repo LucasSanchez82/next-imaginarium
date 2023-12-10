@@ -1,7 +1,7 @@
 "use client";
-import { DialogAddEnfantForm } from "@/app/(connected)/enfants/dialogAddEnfantForm";
-import PreviousNextBar from "@/app/(connected)/enfants/previousNextBar";
-import SearchBar from "@/app/(connected)/enfants/searchEnfantBar";
+import { DialogAddEnfantForm } from "@/components/enfants/dialogAddEnfantForm";
+import PreviousNextBar from "@/components/enfants/previousNextBar";
+import SearchBar from "@/components/enfants/searchEnfantBar";
 import {
   Table,
   TableBody,
@@ -113,7 +113,7 @@ export function TableEnfant({
                 <TableCell>
                   <Link
                     className="underline rounded p-1 bg-secondary"
-                    href={"/enfants/" + enfant.id + "/dossier"}
+                    href={"/enfants/" + enfant.id + "/edt"}
                   >
                     Semaines({enfant._count.edtSemaine})
                   </Link>

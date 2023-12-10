@@ -3,6 +3,7 @@ import { flashDatas } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 import { PropsWithChildren } from "react";
 
+
 const isConnectedWrapper = async ({ children }: PropsWithChildren) => {
   const session = await getServerSession(authOptions);
   if (session?.user) {
