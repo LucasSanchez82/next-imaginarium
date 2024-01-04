@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/utils';
-
+import Calendar from './calendar';
 const page = async ({ params }: { params: { idEnfant: string } }) => {
   const enfantEtSemaines = await prisma.enfant.findUnique({
     select: {
@@ -30,7 +30,8 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
       // </>
       <>
         <h1>hello schedule</h1>
-      </>
+        <Calendar />
+      </> 
     );
   } else {
     return <h2 className="bg-red-400 bold ">aucun enfant trouvé</h2>;

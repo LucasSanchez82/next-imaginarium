@@ -22,10 +22,9 @@ const page = async () => {
     orderBy: { id: "desc" },
     ...configRequestPrisma,
   });
-  console.log(enfants[0]);
 
-  const enfantsCount = await prisma.enfant.count();
-  const nbPages = Math.ceil(enfantsCount / limit.take);
+  // const enfantsCount = await prisma.enfant.count();
+  // const nbPages = Math.ceil(enfantsCount / limit.take);
 
   return (
     <>
@@ -33,7 +32,7 @@ const page = async () => {
         configRequestPrisma={configRequestPrisma}
         enfants={enfants}
         limit={limit}
-        nbPages={nbPages}
+        nbPages={1}
       />
     </>
   );

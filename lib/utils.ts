@@ -4,7 +4,10 @@ import { twMerge } from "tailwind-merge";
 import { authOptions } from "./auth";
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient();
+export const prisma = new PrismaClient({
+  log:
+    process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+});
 
 export type flashDataType = {isError: boolean, message: string};
 
