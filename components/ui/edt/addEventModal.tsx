@@ -6,11 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import eventSchema from "@/components/zodSchemas/event";
+import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import { EventInput } from "@fullcalendar/core/index.js";
 import { EventImpl } from "@fullcalendar/core/internal";
+import { useEffect } from "react";
 import AutoForm from "../auto-form";
-import { use, useEffect } from "react";
+import { Trash2 } from "lucide-react";
 
 export function AddEventModal({
   open,
@@ -21,7 +22,6 @@ export function AddEventModal({
   open: boolean;
   setOpen: (open: boolean) => void;
   addCalendarEvent: (event: EventInput) => void;
-
   useUpdateEvent: {
     updateEvent: EventImpl | null;
     updateEventReset: () => void;
@@ -34,11 +34,16 @@ export function AddEventModal({
       console.log("ferme");
       updateEventReset();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const handleSubmit = (values: { title: string; description: string }) => {
-    addCalendarEvent({ ...values });
+  const handleSubmit = (values: CalendarEvent) => {
+    if (updateEvent?.title) {
+      updateEvent.setProp("title", values.title);
+      updateEvent.setExtendedProp("description", values.description);
+    } else {
+      addCalendarEvent({ ...values });
+    }
     setOpen(false);
   };
 
@@ -51,32 +56,44 @@ export function AddEventModal({
     >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>
+            {updateEvent ? "Modifier l'évènement" : "Ajouter un évènement"}
+          </DialogTitle>
         </DialogHeader>
         <AutoForm
           formSchema={eventSchema}
           onSubmit={handleSubmit}
+          values={{
+            title: updateEvent?._def.title,
+            description: updateEvent?._def.extendedProps.description,
+          }}
           fieldConfig={{
             title: {
-              description: "The title of the event.",
-              fieldType: "fallback",
               inputProps: {
                 placeholder: "Mon titre...",
-                defaultValue: updateEvent?._def.title,
+                required: false,
+                minLength: undefined,
               },
             },
             description: {
-              description: "The description of the event.",
               fieldType: "textarea",
               inputProps: {
                 placeholder: "Ma description...",
-                defaultValue: updateEvent?._def.extendedProps.description,
+                required: false,
               },
             },
           }}
         >
-          <DialogFooter>
-            <Button type="submit">Save changes</Button>
+          <DialogFooter className=" w-full flex items-around justify-around">
+            {updateEvent && (
+              <Button type="button" onClick={() => {
+                console.log("supprimer");
+              }}>
+                <Trash2 color="#e22222" />
+              </Button>
+            )}
+
+            <Button type="submit">Sauvegarder les changements</Button>
           </DialogFooter>
         </AutoForm>
       </DialogContent>

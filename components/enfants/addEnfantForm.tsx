@@ -21,6 +21,8 @@ const AddEnfantForm = ({setOpen}: {setOpen: Dispatch<SetStateAction<boolean>>}) 
         body: JSON.stringify(data),
       })
       const res = await response.json();
+      console.log("addEnfnantForm response")
+      console.log(res);
       if(response.ok){
         setOpen(false);
         toast({

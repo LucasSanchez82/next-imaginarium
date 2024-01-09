@@ -13,8 +13,7 @@ import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useState } from "react";
-
-
+import frLocale from '@fullcalendar/core/locales/fr'
 function Calendar() {
   const [calendarState, setCalendarState] = useState<{
     showModal: boolean;
@@ -37,7 +36,14 @@ function Calendar() {
   const addCalendarEvent = (event: EventInput) => {
     setCalendarState((curr) => ({
       ...curr,
-      calendarEvents: [...curr.calendarEvents, {id: String(curr.calendarEvents.length+1), ...event, ...curr.currDate }],
+      calendarEvents: [
+        ...curr.calendarEvents,
+        {
+          id: String(curr.calendarEvents.length + 1),
+          ...event,
+          ...curr.currDate,
+        },
+      ],
     }));
   };
 
@@ -84,17 +90,19 @@ function Calendar() {
    * Handles the click event on an event.
    * @param {EventClickArg} event - The event object containing the clicked event.
    */
-  const handleEventClick = ({ event, el, view }: EventClickArg) => {
+  const handleEventClick = ({ event }: EventClickArg) => {
     setUpdateEvent(event);
-    if (event.end && event.start) {
-      setCurrDate({ start: event.start, end: event.end });
-    }else {
+    if (event.start) {
+      console.log("event handleEventClick", event);
+      setCurrDate({ start: event.start, end: event.end || undefined});
+      setShowModal(true);
+    } else {
+      console.log
       toast({
         title: "Erreur",
         description: "L'évènement n'a pas de dates.",
-      })
+      });
     }
-    setShowModal(true);
   };
 
   /**
@@ -108,7 +116,9 @@ function Calendar() {
 
   return (
     <div>
-      <Button onClick={() => console.log(calendarEvents)}>voir les events</Button>
+      <Button onClick={() => console.log(calendarEvents)}>
+        voir les events
+      </Button>
       <Fullcalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={"dayGridMonth"}
@@ -121,7 +131,7 @@ function Calendar() {
         // eventContent={({event}) => (
         //   <div className="flex flex-col justify-start items-center m-auto bg-blue-400 rounded p-1">
         //     <b>{event.title}</b>
-        //     <i className="">{event._def.extendedProps.description}</i>
+        //     {/* <i className="">{event._def.extendedProps.description}</i> */}
         //   </div>
         // )}
         dateClick={handleDateClick}
@@ -129,6 +139,10 @@ function Calendar() {
         select={handleSelect} // triggered when a date/time selection is made;
         events={calendarEvents}
         eventClick={handleEventClick}
+        locale={frLocale}
+        droppable={true}
+        eventDrop={(event) => console.log("eventDrop", event)}
+        editable={true}
       />
       <AddEventModal
         open={showModal}
