@@ -8,12 +8,13 @@ import {
   EventInput,
 } from "@fullcalendar/core/index.js";
 import { EventImpl } from "@fullcalendar/core/internal";
+import frLocale from '@fullcalendar/core/locales/fr';
 import dayGridPlugin from "@fullcalendar/daygrid";
-import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
+import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useState } from "react";
-import frLocale from '@fullcalendar/core/locales/fr'
+
 function Calendar() {
   const [calendarState, setCalendarState] = useState<{
     showModal: boolean;
@@ -76,16 +77,7 @@ function Calendar() {
       currDate: date,
     }));
   };
-
-  /**
-   * Handles the click event on a date.
-   * @param {DateClickArg} event - The event object containing the clicked date.
-   */
-  const handleDateClick = (event: DateClickArg) => {
-    setCurrDate({ start: event.date });
-    setShowModal(true);
-  };
-
+  
   /**
    * Handles the click event on an event.
    * @param {EventClickArg} event - The event object containing the clicked event.
@@ -93,7 +85,6 @@ function Calendar() {
   const handleEventClick = ({ event }: EventClickArg) => {
     setUpdateEvent(event);
     if (event.start) {
-      console.log("event handleEventClick", event);
       setCurrDate({ start: event.start, end: event.end || undefined});
       setShowModal(true);
     } else {
@@ -110,6 +101,7 @@ function Calendar() {
    * @param {DateSelectArg} args - The object containing the start and end dates of the selection.
    */
   const handleSelect = (args: DateSelectArg) => {
+    console.log("handleSelect", args)
     setCurrDate({ start: args.start, end: args.end });
     setShowModal(true);
   };
@@ -128,13 +120,6 @@ function Calendar() {
           end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
         }}
         height={"90vh"}
-        // eventContent={({event}) => (
-        //   <div className="flex flex-col justify-start items-center m-auto bg-blue-400 rounded p-1">
-        //     <b>{event.title}</b>
-        //     {/* <i className="">{event._def.extendedProps.description}</i> */}
-        //   </div>
-        // )}
-        dateClick={handleDateClick}
         selectable={true}
         select={handleSelect} // triggered when a date/time selection is made;
         events={calendarEvents}
@@ -152,6 +137,7 @@ function Calendar() {
           updateEvent: calendarState.updateEvent,
           updateEventReset: () => setUpdateEvent(null),
         }}
+        dates={calendarState.currDate}
       />
     </div>
   );

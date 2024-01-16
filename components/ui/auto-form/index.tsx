@@ -68,6 +68,9 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
           const parsedValues = formSchema.safeParse(values);
           if (parsedValues.success) {
             onParsedValuesChange?.(parsedValues.data);
+          }else {
+            console.log("error", parsedValues.error);
+            console.log("valuesProp", valuesProp)
           }
         }}
         className={cn("space-y-5", className)}
