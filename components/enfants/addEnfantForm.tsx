@@ -14,15 +14,12 @@ const AddEnfantForm = ({setOpen}: {setOpen: Dispatch<SetStateAction<boolean>>}) 
 
     if(safeValues.success){
       const { data } = safeValues;
-      console.log(data);
       
       const response = await fetch('/api/enfants', {
         method: 'POST',
         body: JSON.stringify(data),
       })
       const res = await response.json();
-      console.log("addEnfnantForm response")
-      console.log(res);
       if(response.ok){
         setOpen(false);
         toast({

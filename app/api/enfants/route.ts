@@ -25,7 +25,7 @@ export const POST = async (req: Request) => {
         { status: 200 }
       );
     } catch (error) {
-      console.log("Error", error);
+      console.error("Error", error);
       return NextResponse.json(
         { error: "Erreur du serveur à ajouter l'enfant" },
         { status: 500 }
@@ -33,7 +33,6 @@ export const POST = async (req: Request) => {
     }
   } else {
     console.error(safeValues.error);
-    console.log('body', body);
     return NextResponse.json({
       error: `Informations enfant corrompus :\n${safeValues.error.message}`,
     }, {status: 401});

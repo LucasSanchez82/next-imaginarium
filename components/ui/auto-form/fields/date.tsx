@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-import { DatePicker } from "../../date-picker";
+import { isoToLocalDate } from "@/lib/dateUtils";
 import {
   FormControl,
   FormDescription,
@@ -9,8 +8,6 @@ import {
 } from "../../form";
 import { Input } from "../../input";
 import { AutoFormInputComponentProps } from "../types";
-import { Button } from "react-day-picker";
-import { DateTimePicker } from "../../dateTimePicker/date-time-picker";
 
 export default function AutoFormDate({
   label,
@@ -19,8 +16,10 @@ export default function AutoFormDate({
   fieldConfigItem,
   fieldProps,
 }: AutoFormInputComponentProps) {
-
-  const ref = useRef<HTMLInputElement>(null);
+  field.value =
+    fieldProps.value instanceof Date
+      ? isoToLocalDate(fieldProps.value)
+      : undefined;
   return (
     <FormItem>
       <FormLabel>
@@ -34,12 +33,12 @@ export default function AutoFormDate({
           {...fieldProps}
         /> */}
         <Input
-        onClick={(e) => console.log(e.target instanceof HTMLInputElement && e.target.value)}
-          type="date"
+          {...fieldConfigItem}
+          {...fieldConfigItem.inputProps}
           value={field.value}
-          defaultValue={field.value}
+          onChangeCapture={field.onChange}
+          type="date"
           onChange={field.onChange}
-          {...fieldProps}
         />
         {/* <DateTimePicker 
           value={field.value}

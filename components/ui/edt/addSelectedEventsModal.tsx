@@ -21,8 +21,7 @@ export function AddSelectedEventsModal({
   date: Date;
   addCalendarEvent: (event: EventInput) => void
 }) {
-  const handleSubmit = (values: { title: string; description: string }) => {
-    console.log({ ...values, date: date.toLocaleString() });
+  const handleSubmit = (values: { title: string; description?: string, start: Date, end: Date }) => {
     addCalendarEvent({...values})
   };
 

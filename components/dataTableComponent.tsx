@@ -62,7 +62,6 @@ export function TableEnfant({
   useEffect(() => {
     if (isMounted) {
       //ca ne sert a rien de le lancer au chargement
-      console.log("lancement du useeffect");
       reloadVisibleEnfants();
     } else {
       setIsMounted(true);
@@ -115,7 +114,7 @@ export function TableEnfant({
                     className="underline rounded p-1 bg-secondary"
                     href={"/enfants/" + enfant.id + "/edt"}
                   >
-                    Semaines({enfant._count.edtSemaine})
+                    calendrier
                   </Link>
                 </TableCell>
               </TableRow>

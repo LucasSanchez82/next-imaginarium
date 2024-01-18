@@ -26,7 +26,6 @@ export function DialogAddEnfantForm({
 
     if (safeValues.success) {
       const { data } = safeValues;
-      console.log(data);
 
       const response = await fetch("/api/enfants", {
         method: "POST",

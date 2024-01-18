@@ -1,18 +1,25 @@
-import { prisma } from '@/lib/utils';
-import Calendar from './calendar';
+import { prisma } from "@/lib/utils";
+import Calendar from "./calendar";
 const page = async ({ params }: { params: { idEnfant: string } }) => {
-  const enfantEtSemaines = await prisma.enfant.findUnique({
+  const idEnfantNumber = Number(params.idEnfant);
+  if (isNaN(idEnfantNumber)) {
+    return <h2 className="bg-red-400 bold ">aucun enfant trouvé</h2>;
+  }
+
+  const enfantEdtSemaines = await prisma.enfant.findUnique({
     select: {
       nom: true,
       prenom: true,
-      edtSemaine: true,
     },
     where: {
-      id: params.idEnfant,
+      id: idEnfantNumber,
     },
   });
-  if (enfantEtSemaines) {
-    const { edtSemaine, nom, prenom } = enfantEtSemaines;
+
+  const evenements = await prisma.evenement.findMany();
+
+  if (enfantEdtSemaines) {
+    const { nom, prenom } = enfantEdtSemaines;
     return (
       // <>
       //   {/* <Form idEnfant={params.idEnfant} /> */}
@@ -30,8 +37,27 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
       // </>
       <>
         <h1>hello schedule</h1>
-        <Calendar />
-      </> 
+        <Calendar
+          calendarEvents={evenements.map(
+            (
+              curr
+            ): {
+              id: string;
+              title: string;
+              description: string | null;
+              start: Date;
+              end: Date;
+            } => ({
+              id: String(curr.id),
+              title: curr.titre,
+              description: curr.description,
+              start: curr.dateDebut,
+              end: curr.dateFin,
+            })
+          )}
+          idEnfant={idEnfantNumber}
+        />
+      </>
     );
   } else {
     return <h2 className="bg-red-400 bold ">aucun enfant trouvé</h2>;

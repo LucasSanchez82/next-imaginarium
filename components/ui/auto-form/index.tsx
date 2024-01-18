@@ -29,15 +29,17 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   fieldConfig,
   children,
   className,
+  action
 }: {
   formSchema: SchemaType;
   values?: Partial<z.infer<SchemaType>>;
   onValuesChange?: (values: Partial<z.infer<SchemaType>>) => void;
   onParsedValuesChange?: (values: Partial<z.infer<SchemaType>>) => void;
-  onSubmit?: (values: z.infer<SchemaType>) => void;
+  onSubmit?: (values: z.infer<SchemaType>) => void | Promise<void>;
   fieldConfig?: FieldConfig<z.infer<SchemaType>>;
   children?: React.ReactNode;
   className?: string;
+  action?: string | ((formData: FormData) => void) | undefined;
 }) {
   const objectFormSchema = getObjectFormSchema(formSchema);
   const defaultValues: DefaultValues<z.infer<typeof objectFormSchema>> =
@@ -62,15 +64,13 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
         onSubmit={(e) => {
           form.handleSubmit(onSubmit)(e);
         }}
+        action={action}
         onChange={() => {
           const values = form.getValues();
           onValuesChangeProp?.(values);
           const parsedValues = formSchema.safeParse(values);
           if (parsedValues.success) {
             onParsedValuesChange?.(parsedValues.data);
-          }else {
-            console.log("error", parsedValues.error);
-            console.log("valuesProp", valuesProp)
           }
         }}
         className={cn("space-y-5", className)}

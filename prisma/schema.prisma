@@ -18,8 +18,8 @@ model User {
   isAdmin    Boolean  @default(false)
   isVerified Boolean  @default(false)
   image      String?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now()) @db.Timestamp()
+  updatedAt  DateTime? @db.Timestamp() @updatedAt
 
   enfant Enfant[]
 
@@ -27,52 +27,54 @@ model User {
 }
 
 model Enfant {
-  id            String      @id @default(cuid())
-  nom           String
-  prenom        String
+  id            Int      @id @default(autoincrement())
+  nom           String   @db.TinyText
+  prenom        String   @db.TinyText
   telephone     String?
   email         String?
-  dateNaissance DateTime
-  idReferent String
-  
+  dateNaissance DateTime @db.Timestamp()
+  idReferent    String
+
+  evenements Evenement[]
   document   Document[]
-  edtSemaine    EmploiDuTempsSemaine[]
-  referent      User @relation(fields: [idReferent], references: [id])
+  referent   User        @relation(fields: [idReferent], references: [id])
 }
 
 model Document {
   id              Int    @id @default(autoincrement())
   libelleDocument String
   cheminDocument  String
-  idEnfant        String
+  idEnfant        Int
   enfant          Enfant @relation(fields: [idEnfant], references: [id])
 }
 
-
-model EmploiDuTempsSemaine {
-  id       String          @id @default(cuid())
-  semaine  Int
-  idEnfant String
-  enfant   Enfant          @relation(fields: [idEnfant], references: [id])
-
-  jours    EdtJour[]          // Relation avec les jours de la semaine
+model EdtSemaine {
+  id           Int       @id @default(autoincrement())
+  debutSemaine DateTime  @db.Timestamp()
+  jours        EdtJour[] // Relation avec les jours de la semaine
 }
 
 model EdtJour {
-  id                 String                @id @default(cuid())
-  nom                String
-  idEmploiDuTempsSemaine String
-  emploiDuTempsSemaine EmploiDuTempsSemaine @relation(fields: [idEmploiDuTempsSemaine], references: [id])
+  id                     Int                  @id @default(autoincrement())
+  date                   DateTime             @db.Timestamp()
+  idSemaine Int
+  edtSemaine   EdtSemaine @relation(fields: [idSemaine], references: [id])
 
-  sequencesJournee EdtSequenceJournee[]       // Relation avec les séquences de la journée
+  sequencesJournee Evenement[] // Relation avec les séquences de la journée
 }
 
-model EdtSequenceJournee {
-  id         String      @id @default(cuid())
-  heureDebut DateTime
-  heureFin   DateTime
-  idJour     String
-  jour       EdtJour        @relation(fields: [idJour], references: [id])
+model Evenement {
+  id          Int      @id @default(autoincrement())
+  dateDebut   DateTime @db.Timestamp()
+  dateFin     DateTime @db.Timestamp() @default(now())
+  titre       String   @db.TinyText
+  description String?
+
+  idJour   Int
+  idEnfant Int
+
+  enfant Enfant  @relation(fields: [idEnfant], references: [id])
+  jour   EdtJour @relation(fields: [idJour], references: [id])
 }
 
 // ...

@@ -1,3 +1,5 @@
+import { Enfant } from "@prisma/client";
+
 export type addEnfantType = {
   nom: string;
   prenom: string;
@@ -14,23 +16,12 @@ export type enfantType = {
   dateNaissance: Date;
 };
 
-export type getEnfant = {
-  id: string;
-  nom: string;
-  prenom: string;
-  telephone: string | null;
-  email: string | null;
-  dateNaissance: Date;
-  idReferent: string;
-  edtSemaine: {
-    id: string;
-  }[];
+export type getEnfant = Enfant & {
   referent: {
     email: string;
   };
   _count: {
     document: number;
-    edtSemaine: number;
   };
 };
 
@@ -43,14 +34,11 @@ export type configRequestEnfantPrismaType = {
     telephone: true;
     nom: true;
     prenom: true;
-    _count: { select: { document: true; edtSemaine: true } };
+    _count: { select: { document: true } };
     referent: {
       select: {
         email: true;
       };
-    };
-    edtSemaine: {
-      select: { id: true };
     };
   };
 };

@@ -12,9 +12,8 @@ const page = async () => {
       telephone: true,
       nom: true,
       prenom: true,
-      _count: { select: { document: true, edtSemaine: true } },
+      _count: { select: { document: true} },
       referent: { select: { email: true } },
-      edtSemaine: { select: { id: true } },
     },
   };
   const enfants = await prisma.enfant.findMany({

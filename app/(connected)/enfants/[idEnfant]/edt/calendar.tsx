@@ -1,29 +1,41 @@
 "use client";
+import {
+  addEvenementToDb,
+  updateEvenementToDb,
+} from "@/components/actions/edt";
 import { Button } from "@/components/ui/button";
 import { AddEventModal } from "@/components/ui/edt/addEventModal";
 import { useToast } from "@/components/ui/use-toast";
+import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import {
   DateSelectArg,
   EventClickArg,
   EventInput,
 } from "@fullcalendar/core/index.js";
 import { EventImpl } from "@fullcalendar/core/internal";
-import frLocale from '@fullcalendar/core/locales/fr';
+import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { revalidatePath } from "next/cache";
 import { useState } from "react";
 
-function Calendar() {
+function Calendar({
+  idEnfant,
+  calendarEvents: calendarEventsInitial,
+}: {
+  idEnfant: number;
+  calendarEvents: EventInput;
+}) {
   const [calendarState, setCalendarState] = useState<{
     showModal: boolean;
-    calendarEvents: EventInput[];
+    calendarEvents: EventInput;
     currDate: { start: Date; end?: Date };
     updateEvent: EventImpl | null;
   }>({
     showModal: false,
-    calendarEvents: [],
+    calendarEvents: calendarEventsInitial,
     currDate: { start: new Date() },
     updateEvent: null,
   });
@@ -32,20 +44,28 @@ function Calendar() {
 
   /**
    * Adds a new event to the calendar state.
-   * @param {EventInput} event - The event to be added.
+   * @param {CalendarEvent} event - The event to be added.
    */
-  const addCalendarEvent = (event: EventInput) => {
-    setCalendarState((curr) => ({
-      ...curr,
-      calendarEvents: [
-        ...curr.calendarEvents,
+  const addCalendarEvent = async (event: CalendarEvent) => {
+    try {
+      const addedEvent = await addEvenementToDb(
         {
-          id: String(curr.calendarEvents.length + 1),
-          ...event,
-          ...curr.currDate,
+          dateDebut: event.start,
+          dateFin: event.end,
+          description: event.description || null,
+          titre: event.title,
+          idEnfant: idEnfant,
         },
-      ],
-    }));
+        "/(connected)/enfants/[idEnfant]/edt/"
+      );
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'ajout de l'évènement.",
+        variant: "destructive",
+      });
+    }
   };
 
   /**
@@ -61,10 +81,63 @@ function Calendar() {
 
   /**
    * Updates an event in the calendar state.
-   * @param {EventInput} event - The event to be updated.
+   * @param {EventImpl | null} event - The event to be updated.
    */
   const setUpdateEvent = (event: EventImpl | null) => {
     setCalendarState((curr) => ({ ...curr, updateEvent: event }));
+  };
+
+
+  /**
+   * Updates a calendar event.
+   * @param event The event to update.
+   * @returns A promise that resolves when the event is updated.
+   */
+  const updateCalendarEvent = async (event: EventImpl) => {
+    // setCalendarState((curr) => ({ ...curr, updateEvent: event }));
+    const evenementUpdateAbled = {
+      dateDebut: event.start,
+      dateFin: event.end,
+      description: event.extendedProps.description || null,
+      titre: event.title || "",
+      idEnfant: idEnfant,
+      id: Number(event.id) || null,
+    };
+    const eventParsed = eventSchema.safeParse(evenementUpdateAbled);
+    if (eventParsed.success) {
+      const {
+        end: dateFin,
+        start: dateDebut,
+        title: titre,
+        description,
+      } = eventParsed.data;
+      const id = Number(evenementUpdateAbled.id);
+      if (!(isNaN(id) || id === null)) {
+        await updateEvenementToDb(
+          { id, dateFin, dateDebut, titre, description: description || null },
+          "/(connected)/enfants/[idEnfant]/edt/"
+        );
+      } else {
+        // no coherent id
+        toast({
+          title: "Erreur",
+          description:
+            "Une erreur est survenue lors de la mise à jour de l'évènement : \n" +
+            "Aucun id n'a été trouvé pour l'évènement",
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      // zod error
+      toast({
+        title: "Erreur",
+        description:
+          "Une erreur est survenue lors de la mise à jour de l'évènement : \n" +
+          eventParsed.error.issues.map((el) => el.message).join("\n"),
+        variant: "destructive",
+      });
+    }
   };
 
   /**
@@ -77,7 +150,7 @@ function Calendar() {
       currDate: date,
     }));
   };
-  
+
   /**
    * Handles the click event on an event.
    * @param {EventClickArg} event - The event object containing the clicked event.
@@ -85,10 +158,9 @@ function Calendar() {
   const handleEventClick = ({ event }: EventClickArg) => {
     setUpdateEvent(event);
     if (event.start) {
-      setCurrDate({ start: event.start, end: event.end || undefined});
+      setCurrDate({ start: event.start, end: event.end || undefined });
       setShowModal(true);
     } else {
-      console.log
       toast({
         title: "Erreur",
         description: "L'évènement n'a pas de dates.",
@@ -101,15 +173,14 @@ function Calendar() {
    * @param {DateSelectArg} args - The object containing the start and end dates of the selection.
    */
   const handleSelect = (args: DateSelectArg) => {
-    console.log("handleSelect", args)
     setCurrDate({ start: args.start, end: args.end });
     setShowModal(true);
   };
 
   return (
     <div>
-      <Button onClick={() => console.log(calendarEvents)}>
-        voir les events
+      <Button onClick={() => console.log(calendarEventsInitial)}>
+        clique moi
       </Button>
       <Fullcalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -122,11 +193,10 @@ function Calendar() {
         height={"90vh"}
         selectable={true}
         select={handleSelect} // triggered when a date/time selection is made;
-        events={calendarEvents}
+        events={calendarEventsInitial}
         eventClick={handleEventClick}
         locale={frLocale}
         droppable={true}
-        eventDrop={(event) => console.log("eventDrop", event)}
         editable={true}
       />
       <AddEventModal
@@ -135,9 +205,9 @@ function Calendar() {
         addCalendarEvent={addCalendarEvent}
         useUpdateEvent={{
           updateEvent: calendarState.updateEvent,
-          updateEventReset: () => setUpdateEvent(null),
+          setUpdate: updateCalendarEvent,
         }}
-        dates={calendarState.currDate}
+        useDates={{ dates: calendarState.currDate, setDates: setCurrDate }}
       />
     </div>
   );

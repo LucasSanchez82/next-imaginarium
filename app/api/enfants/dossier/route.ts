@@ -7,23 +7,23 @@ import { readFile, readdir, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import { join } from "path";
 
-const addToDatabase = async (document: {
-  libelleDocument: string;
-  cheminDocument: string;
-  idEnfant: string;
-}) => {
-  const safeDocument = addDocumentSchema.safeParse(document);
-  if (safeDocument.success) {
-    prisma.document.create({ data: safeDocument.data });
-  }
-};
+// const addToDatabase = async (document: {
+//   libelleDocument: string;
+//   cheminDocument: string;
+//   idEnfant: string;
+// }) => {
+//   const safeDocument = addDocumentSchema.safeParse(document);
+//   if (safeDocument.success) {
+//     prisma.document.create({ data: safeDocument.data });
+//   }
+// };
 
 export const POST = async (req: Request) => {
   const body = await req.formData();
   const file = body.get("file") as File;
-  console.log();
   
-  const idEnfant = String(body.get("idEnfant"));
+  const idEnfant = Number(body.get("idEnfant"));
+  if(isNaN(idEnfant)) throw Error('idEnfant n\'est pas un nombre')
   const nbEnfants = await prisma.enfant.count({ where: { id: idEnfant } });
 
   if (nbEnfants !== 1) {

@@ -5,15 +5,16 @@ const eventSchema = z
     title: z
       .string({ required_error: "Obligatoire" })
       .min(3, { message: "doit contenir plus de 3 caracteres" })
+      .max(50, { message: "doit contenir moins de 50 caracteres" })
       .describe("Titre de l'événement"),
-    description: z.string().describe("Description de l'événement").optional(),
-    dateDebut: z.coerce
+    description: z.string().nullable().describe("Description de l'événement").optional(),
+    start: z.coerce
       .date({
         required_error: "Obligatoire",
         invalid_type_error: "date invalide",
       })
       .describe("Date de début de l'événement"),
-    dateFin: z.coerce
+    end: z.coerce
       .date({
         required_error: "Obligatoire",
         invalid_type_error: "date invalide",
@@ -21,14 +22,15 @@ const eventSchema = z
       })
       .describe("Date de fin de l'événement"),
   })
-  .refine((data) => data.dateDebut < data.dateFin, {
+  .refine((data) => data.start < data.end, {
     message: "La date de début doit être avant la date de fin",
     path: ["dateDebut", "dateFin"],
   });
 export type CalendarEvent = {
+  id?: number;
   title: string;
-  description?: string;
-  dateDebut: Date;
-  dateFin: Date;
+  description?: string | null;
+  start: Date;
+  end: Date;
 };
 export default eventSchema;
