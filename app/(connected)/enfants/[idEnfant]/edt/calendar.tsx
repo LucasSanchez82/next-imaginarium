@@ -1,6 +1,7 @@
 "use client";
 import {
   addEvenementToDb,
+  deleteEvenementToDb,
   updateEvenementToDb,
 } from "@/components/actions/edt";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,9 @@ import { useToast } from "@/components/ui/use-toast";
 import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import {
   DateSelectArg,
+  EventChangeArg,
   EventClickArg,
+  EventDropArg,
   EventInput,
 } from "@fullcalendar/core/index.js";
 import { EventImpl } from "@fullcalendar/core/internal";
@@ -39,7 +42,7 @@ function Calendar({
     currDate: { start: new Date() },
     updateEvent: null,
   });
-  const { showModal, calendarEvents } = calendarState;
+  const { showModal, updateEvent } = calendarState;
   const { toast } = useToast();
 
   /**
@@ -86,7 +89,6 @@ function Calendar({
   const setUpdateEvent = (event: EventImpl | null) => {
     setCalendarState((curr) => ({ ...curr, updateEvent: event }));
   };
-
 
   /**
    * Updates a calendar event.
@@ -140,6 +142,26 @@ function Calendar({
     }
   };
 
+  const deleteCalendarEvent = async () => {
+    try {
+      const id = Number(updateEvent?._def.publicId);
+      if (id) {
+        deleteEvenementToDb({ id }, "/(connected)/enfants/[idEnfant]/edt/");
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Il manque l'id de l'évènement",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      setUpdateEvent(null);
+    }
+  };
+
   /**
    * Sets the current date in the calendar state.
    * @param {{ start: Date; end?: Date }} date - The date to be set.
@@ -177,12 +199,33 @@ function Calendar({
     setShowModal(true);
   };
 
+  const handleEventChange = async (event: EventChangeArg) => {
+    const dates = event.event.start &&
+      event.event.end && { start: event.event.start, end: event.event.end };
+    const id = Number(event.event._def.publicId);
+    const titre = event.event._def.title;
+    const description = event.event._def.extendedProps.description || null;
+    if (dates && id) {
+      await updateEvenementToDb(
+        {
+          id,
+          dateDebut: dates.start,
+          dateFin: dates.end,
+          description,
+          titre,
+        },
+        "/(connected)/enfants/[idEnfant]/edt/"
+      );
+    }
+  };
+
   return (
     <div>
       <Button onClick={() => console.log(calendarEventsInitial)}>
         clique moi
       </Button>
       <Fullcalendar
+        timeZone="Paris/Europe"
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={"dayGridMonth"}
         headerToolbar={{
@@ -196,8 +239,8 @@ function Calendar({
         events={calendarEventsInitial}
         eventClick={handleEventClick}
         locale={frLocale}
-        droppable={true}
         editable={true}
+        eventChange={handleEventChange}
       />
       <AddEventModal
         open={showModal}
@@ -208,6 +251,8 @@ function Calendar({
           setUpdate: updateCalendarEvent,
         }}
         useDates={{ dates: calendarState.currDate, setDates: setCurrDate }}
+        deleteCalendarEvent={deleteCalendarEvent}
+        updateEvenementToDb={updateEvenementToDb}
       />
     </div>
   );

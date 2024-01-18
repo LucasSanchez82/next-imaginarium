@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,10 +10,9 @@ import {
 import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import { EventImpl } from "@fullcalendar/core/internal";
 import { Trash2 } from "lucide-react";
-import { use, useEffect } from "react";
 import AutoForm from "../auto-form";
-import { updateEvenementToDb } from "@/components/actions/edt";
 import { toast } from "../use-toast";
+import { Evenement } from "@prisma/client";
 
 export function AddEventModal({
   open,
@@ -20,6 +20,8 @@ export function AddEventModal({
   addCalendarEvent,
   useUpdateEvent,
   useDates,
+  deleteCalendarEvent,
+  updateEvenementToDb
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
@@ -32,19 +34,20 @@ export function AddEventModal({
     dates: { start: Date; end?: Date };
     setDates: (dates: { start: Date; end?: Date }) => void;
   };
+  deleteCalendarEvent: () => Promise<void>;
+  updateEvenementToDb: (evenement: Omit<Evenement, "idEnfant" | "idJour">, path?: string) => Promise<{
+    id: number;
+    dateDebut: Date;
+    dateFin: Date;
+    titre: string;
+    description: string | null;
+    idJour: number;
+    idEnfant: number;
+}>;
 }) {
   const { updateEvent, setUpdate: updateEventReset } = useUpdateEvent;
   const { dates, setDates } = useDates;
-  useEffect(() => {
-    console.log('useEffect updateEvent : \n', updateEvent);
-  }, [updateEvent, useUpdateEvent]);
 
-  // useEffect(() => {
-  //   if (!open) {
-  //     updateEventReset();
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [open]);
   const handleSubmit = async (values: CalendarEvent) => {
     if (updateEvent?.title) {
       const {
@@ -84,6 +87,10 @@ export function AddEventModal({
     setOpen(false);
   };
 
+  const handleDelete = async () => {
+    await deleteCalendarEvent();
+    setOpen(false);
+  };
   return (
     <Dialog
       open={open}
@@ -143,7 +150,7 @@ export function AddEventModal({
         >
           <DialogFooter className=" w-full flex items-around justify-around">
             {updateEvent && (
-              <Button type="button">
+              <Button type="button" onClick={handleDelete}>
                 <Trash2 color="#e22222" />
               </Button>
             )}

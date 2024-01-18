@@ -108,7 +108,7 @@ export const updateEvenementToDb = async (
 
     const evenementUpdated = await prisma.evenement.update({
       where: { id },
-      data: {titre, description, dateDebut, dateFin, id },
+      data: { titre, description, dateDebut, dateFin, id },
     });
 
     revalidatePath(path || "/(connected)/enfants/[idEnfant]/edt");
@@ -117,6 +117,29 @@ export const updateEvenementToDb = async (
     console.error("🚀 ~ updateEvenementToDb ~ error:", error);
     throw Error(
       "🚀 ~ updateEvenementToDb ~ error: \n " + JSON.stringify(error)
+    );
+  }
+};
+
+export const deleteEvenementToDb = async (
+  evenement: Pick<Evenement, "id">,
+  path?: string
+) => {
+  try {
+    const id = Number(evenement.id);
+    if (id) {
+      const evenementDeleted = await prisma.evenement.delete({
+        where: { id },
+      });
+      revalidatePath(path || "/(connected)/enfants/[idEnfant]/edt");
+      return evenementDeleted;
+    } else {
+      throw Error("id isn't valid number");
+    }
+  } catch (error) {
+    console.error("🚀 ~ deleteEvenementToDb ~ error:", error);
+    throw Error(
+      "🚀 ~ deleteEvenementToDb ~ error: \n " + JSON.stringify(error)
     );
   }
 };
