@@ -11,7 +11,7 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
       document: true,
     },
     where: {
-      id: params.idEnfant,
+      id: Number(params.idEnfant),
     },
   });
   if (enfantEtDocuments) {
