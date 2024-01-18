@@ -38,4 +38,4 @@ next-env.d.ts
 mysql-data
 .env
 prisma/migrations
-upload/dossierEnfant/*/*
+upload/dossierEnfant/*
