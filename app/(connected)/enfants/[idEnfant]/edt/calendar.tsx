@@ -12,7 +12,6 @@ import {
   DateSelectArg,
   EventChangeArg,
   EventClickArg,
-  EventDropArg,
   EventInput,
 } from "@fullcalendar/core/index.js";
 import { EventImpl } from "@fullcalendar/core/internal";
@@ -21,7 +20,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { revalidatePath } from "next/cache";
+import { set } from "date-fns";
 import { useState } from "react";
 
 function Calendar({
@@ -89,6 +88,8 @@ function Calendar({
   const setUpdateEvent = (event: EventImpl | null) => {
     setCalendarState((curr) => ({ ...curr, updateEvent: event }));
   };
+
+  const resetUpdate = () => setUpdateEvent(null);
 
   /**
    * Updates a calendar event.
@@ -225,7 +226,7 @@ function Calendar({
         clique moi
       </Button>
       <Fullcalendar
-        timeZone="Paris/Europe"
+        // timeZone="Paris/Europe"
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={"dayGridMonth"}
         headerToolbar={{
@@ -248,7 +249,7 @@ function Calendar({
         addCalendarEvent={addCalendarEvent}
         useUpdateEvent={{
           updateEvent: calendarState.updateEvent,
-          setUpdate: updateCalendarEvent,
+          resetUpdate: resetUpdate,
         }}
         useDates={{ dates: calendarState.currDate, setDates: setCurrDate }}
         deleteCalendarEvent={deleteCalendarEvent}

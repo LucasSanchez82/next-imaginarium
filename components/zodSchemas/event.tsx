@@ -1,3 +1,4 @@
+import { Regex } from "lucide-react";
 import { z } from "zod";
 
 const eventSchema = z
@@ -8,6 +9,7 @@ const eventSchema = z
       .max(50, { message: "doit contenir moins de 50 caracteres" })
       .describe("Titre de l'événement"),
     description: z.string().nullable().describe("Description de l'événement").optional(),
+    color: z.string().regex(/^#[0-9a-f]{6}$/i, {message: "format de couleur incorrect ()"}).optional().nullable().describe("Couleur de l'événement"),
     start: z.coerce
       .date({
         required_error: "Obligatoire",
@@ -30,6 +32,7 @@ export type CalendarEvent = {
   id?: number;
   title: string;
   description?: string | null;
+  color?: null | string;
   start: Date;
   end: Date;
 };

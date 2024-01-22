@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +12,8 @@ import { Trash2 } from "lucide-react";
 import AutoForm from "../auto-form";
 import { toast } from "../use-toast";
 import { Evenement } from "@prisma/client";
+import { useEffect } from "react";
+import { dateResetOffset } from "@/lib/dateUtils";
 
 export function AddEventModal({
   open,
@@ -21,21 +22,24 @@ export function AddEventModal({
   useUpdateEvent,
   useDates,
   deleteCalendarEvent,
-  updateEvenementToDb
+  updateEvenementToDb,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
   addCalendarEvent: (event: CalendarEvent) => Promise<void>;
   useUpdateEvent: {
     updateEvent: EventImpl | null;
-    setUpdate: (event: EventImpl) => Promise<void>;
+    resetUpdate: () => void;
   };
   useDates: {
     dates: { start: Date; end?: Date };
     setDates: (dates: { start: Date; end?: Date }) => void;
   };
   deleteCalendarEvent: () => Promise<void>;
-  updateEvenementToDb: (evenement: Omit<Evenement, "idEnfant" | "idJour">, path?: string) => Promise<{
+  updateEvenementToDb: (
+    evenement: Omit<Evenement, "idEnfant" | "idJour">,
+    path?: string
+  ) => Promise<{
     id: number;
     dateDebut: Date;
     dateFin: Date;
@@ -43,12 +47,13 @@ export function AddEventModal({
     description: string | null;
     idJour: number;
     idEnfant: number;
-}>;
+  }>;
 }) {
-  const { updateEvent, setUpdate: updateEventReset } = useUpdateEvent;
+  const { updateEvent, resetUpdate } = useUpdateEvent;
   const { dates, setDates } = useDates;
 
   const handleSubmit = async (values: CalendarEvent) => {
+    console.log(values)
     if (updateEvent?.title) {
       const {
         end: dateFin,
@@ -63,7 +68,7 @@ export function AddEventModal({
         updateEvent.setExtendedProp("description", values.description);
         updateEvent.setStart(values.start);
         updateEvent.setEnd(values.end);
-        updateEvenementToDb(
+        await updateEvenementToDb(
           {
             dateDebut,
             dateFin,
@@ -82,8 +87,12 @@ export function AddEventModal({
       }
     } else {
       // * CREATE
-      await addCalendarEvent({ ...values });
+      const start = dateResetOffset(values.start).toISOString()
+      const end = dateResetOffset(values.end).toISOString()
+      console.log({start, end})
+      // await addCalendarEvent({ ...values });
     }
+    resetUpdate()
     setOpen(false);
   };
 
@@ -146,6 +155,11 @@ export function AddEventModal({
                 required: false,
               },
             },
+            color: {
+              inputProps: {
+                type: "color"
+              }
+            }
           }}
         >
           <DialogFooter className=" w-full flex items-around justify-around">
