@@ -75,6 +75,30 @@ model Evenement {
 
   enfant Enfant  @relation(fields: [idEnfant], references: [id])
   jour   EdtJour @relation(fields: [idJour], references: [id])
+
+  categories EvenementCategorie[]
 }
+
+model Categorie {
+  id          Int        @id @default(autoincrement())
+  libelle     String
+  description String?
+  couleur     String?
+
+  evenements EvenementCategorie[]
+}
+
+model EvenementCategorie {
+  evenement  Evenement @relation(fields: [evenementId], references: [id])
+  categorie  Categorie @relation(fields: [categorieId], references: [id])
+
+  evenementId Int
+  categorieId Int
+
+  @@id([evenementId, categorieId])
+}
+
+
+
 
 // ...

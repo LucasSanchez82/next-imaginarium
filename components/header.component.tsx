@@ -40,7 +40,7 @@ const Header = () => {
             <>
               <li>
                 <Link href="/profile" className="text-ct-dark-600">
-                  Profile
+                  Profil
                 </Link>
               </li>
               <li className="cursor-pointer" onClick={() => signOut()}>
@@ -56,6 +56,11 @@ const Header = () => {
                   <li>
                     <Link href="/enfants" className="text-ct-dark-600">
                       enfants
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/categorie" className="text-ct-dark-600">
+                      categorie
                     </Link>
                   </li>
                 </>

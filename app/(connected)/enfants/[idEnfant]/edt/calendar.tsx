@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AddEventModal } from "@/components/ui/edt/addEventModal";
 import { useToast } from "@/components/ui/use-toast";
-import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
+import { CalendarEvent } from "@/components/zodSchemas/event";
 import {
   DateSelectArg,
   EventChangeArg,
@@ -20,7 +20,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import { set } from "date-fns";
 import { useState } from "react";
 
 function Calendar({
@@ -91,57 +90,6 @@ function Calendar({
 
   const resetUpdate = () => setUpdateEvent(null);
 
-  /**
-   * Updates a calendar event.
-   * @param event The event to update.
-   * @returns A promise that resolves when the event is updated.
-   */
-  const updateCalendarEvent = async (event: EventImpl) => {
-    // setCalendarState((curr) => ({ ...curr, updateEvent: event }));
-    const evenementUpdateAbled = {
-      dateDebut: event.start,
-      dateFin: event.end,
-      description: event.extendedProps.description || null,
-      titre: event.title || "",
-      idEnfant: idEnfant,
-      id: Number(event.id) || null,
-    };
-    const eventParsed = eventSchema.safeParse(evenementUpdateAbled);
-    if (eventParsed.success) {
-      const {
-        end: dateFin,
-        start: dateDebut,
-        title: titre,
-        description,
-      } = eventParsed.data;
-      const id = Number(evenementUpdateAbled.id);
-      if (!(isNaN(id) || id === null)) {
-        await updateEvenementToDb(
-          { id, dateFin, dateDebut, titre, description: description || null },
-          "/(connected)/enfants/[idEnfant]/edt/"
-        );
-      } else {
-        // no coherent id
-        toast({
-          title: "Erreur",
-          description:
-            "Une erreur est survenue lors de la mise à jour de l'évènement : \n" +
-            "Aucun id n'a été trouvé pour l'évènement",
-          variant: "destructive",
-        });
-        return;
-      }
-    } else {
-      // zod error
-      toast({
-        title: "Erreur",
-        description:
-          "Une erreur est survenue lors de la mise à jour de l'évènement : \n" +
-          eventParsed.error.issues.map((el) => el.message).join("\n"),
-        variant: "destructive",
-      });
-    }
-  };
 
   const deleteCalendarEvent = async () => {
     try {

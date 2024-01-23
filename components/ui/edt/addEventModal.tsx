@@ -1,19 +1,17 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
-import { EventImpl } from "@fullcalendar/core/internal";
-import { Trash2 } from "lucide-react";
-import AutoForm from "../auto-form";
-import { toast } from "../use-toast";
-import { Evenement } from "@prisma/client";
-import { useEffect } from "react";
+import {
+  CalendarEvent
+} from "@/components/zodSchemas/event";
 import { dateResetOffset } from "@/lib/dateUtils";
+import { EventImpl } from "@fullcalendar/core/internal";
+import { Evenement } from "@prisma/client";
+import { toast } from "../use-toast";
+import { AddEventForm } from "./AddEventForm";
 
 export function AddEventModal({
   open,
@@ -53,7 +51,6 @@ export function AddEventModal({
   const { dates, setDates } = useDates;
 
   const handleSubmit = async (values: CalendarEvent) => {
-    console.log(values)
     if (updateEvent?.title) {
       const {
         end: dateFin,
@@ -87,16 +84,18 @@ export function AddEventModal({
       }
     } else {
       // * CREATE
-      const start = dateResetOffset(values.start).toISOString()
-      const end = dateResetOffset(values.end).toISOString()
-      console.log({start, end})
-      // await addCalendarEvent({ ...values });
+      const start = dateResetOffset(values.start).toISOString();
+      const end = dateResetOffset(values.end).toISOString();
+      console.log({ start, end });
+      await addCalendarEvent({ ...values });
     }
-    resetUpdate()
+    resetUpdate();
     setOpen(false);
   };
 
   const handleDelete = async () => {
+    console.log('delete');
+    
     await deleteCalendarEvent();
     setOpen(false);
   };
@@ -113,65 +112,13 @@ export function AddEventModal({
             {updateEvent ? "Modifier l'évènement" : "Ajouter un évènement"}
           </DialogTitle>
         </DialogHeader>
-        <AutoForm
-          formSchema={eventSchema}
-          onSubmit={(e) =>
-            handleSubmit({
-              ...e,
-              description: e.description || null,
-              id: Number(updateEvent?._def.publicId) || undefined,
-            })
-          }
-          values={{
-            title: updateEvent?._def.title,
-            description: updateEvent?._def.extendedProps.description,
-            start: dates.start,
-            end: dates.end,
-          }}
-          fieldConfig={{
-            title: {
-              inputProps: {
-                placeholder: "Mon titre...",
-                required: false,
-                minLength: undefined,
-              },
-            },
-            description: {
-              fieldType: "textarea",
-              inputProps: {
-                placeholder: "Ma description...",
-                required: false,
-              },
-            },
-            start: {
-              fieldType: "datetime",
-              inputProps: {
-                required: false,
-              },
-            },
-            end: {
-              fieldType: "datetime",
-              inputProps: {
-                required: false,
-              },
-            },
-            color: {
-              inputProps: {
-                type: "color"
-              }
-            }
-          }}
-        >
-          <DialogFooter className=" w-full flex items-around justify-around">
-            {updateEvent && (
-              <Button type="button" onClick={handleDelete}>
-                <Trash2 color="#e22222" />
-              </Button>
-            )}
-
-            <Button type="submit">Sauvegarder les changements</Button>
-          </DialogFooter>
-        </AutoForm>
+        <AddEventForm
+          updateEvent={updateEvent}
+          dates={dates}
+          setDates={setDates}
+          handleSubmit={handleSubmit}
+          handleDelete={handleDelete}
+        />
       </DialogContent>
     </Dialog>
   );

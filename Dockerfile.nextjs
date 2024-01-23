@@ -3,7 +3,6 @@ FROM node:20
 WORKDIR /app
 
 COPY package*.json ./
-COPY pnpm-lock.yaml ./
 COPY prisma ./prisma/
 COPY .env ./
 
@@ -12,16 +11,15 @@ COPY .env ./
 # RUN chown node:node . node_modules .next
 # RUN chown -R node:node node_modules/
 
-RUN npm install -g pnpm
-RUN pnpm install
-RUN pnpm prisma generate
+RUN npm install
+RUN npm prisma generate
 
 
 EXPOSE 3000
 
 # Générez le code Prisma
-# RUN pnpm prisma generate
+# RUN npm prisma generate
 
 # Exécutez les migrations Prisma (ajustez selon votre configuration)
-# RUN pnpm prisma migrate dev
-CMD ["pnpm", "run", "docker"]
+# RUN npm prisma migrate dev
+CMD npm run build && npm run start

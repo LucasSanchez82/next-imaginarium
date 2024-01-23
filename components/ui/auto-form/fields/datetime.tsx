@@ -8,6 +8,7 @@ import {
 } from "../../form";
 import { Input } from "../../input";
 import { AutoFormInputComponentProps } from "../types";
+import { use, useEffect } from "react";
 
 export default function AutoFormDate({
   label,
@@ -19,7 +20,7 @@ export default function AutoFormDate({
   field.value =
     fieldProps.value instanceof Date
       ? isoToLocalDate(fieldProps.value)
-      : undefined;
+      : fieldProps.value;
   return (
     <FormItem>
       <FormLabel>
@@ -35,7 +36,7 @@ export default function AutoFormDate({
         <Input
           {...fieldConfigItem}
           {...fieldConfigItem.inputProps}
-          value={field.value}
+          value={field.value.slice(0, 16)}
           onChangeCapture={field.onChange}
           type="datetime-local"
           onChange={field.onChange}
