@@ -39,7 +39,7 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   fieldConfig?: FieldConfig<z.infer<SchemaType>>;
   children?: React.ReactNode;
   className?: string;
-  action?: string | ((formData: FormData) => void) | undefined;
+  action?: ((formData: FormData) => void) | undefined;
 }) {
   const objectFormSchema = getObjectFormSchema(formSchema);
   const defaultValues: DefaultValues<z.infer<typeof objectFormSchema>> =
@@ -61,9 +61,12 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   return (
     <Form {...form}>
       <form
-        action={action}
+        action={(e) => {
+          form.handleSubmit(onSubmit)();
+          action && action(e);
+        }}
         onSubmit={(e) => {
-          onSubmitProp && form.handleSubmit(onSubmit)(e);
+          onSubmitProp && form.handleSubmit(onSubmit);
         }}
         onChange={() => {
           const values = form.getValues();

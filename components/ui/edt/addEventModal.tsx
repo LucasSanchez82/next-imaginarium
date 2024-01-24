@@ -94,10 +94,9 @@ export function AddEventModal({
   };
 
   const handleDelete = async () => {
-    console.log('delete');
-    
     await deleteCalendarEvent();
     setOpen(false);
+    resetUpdate();
   };
   return (
     <Dialog

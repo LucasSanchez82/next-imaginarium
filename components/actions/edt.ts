@@ -143,3 +143,7 @@ export const deleteEvenementToDb = async (
     );
   }
 };
+
+export const testEdtServerAction = async () => {
+  console.log("🚀 ~ testEdtServerAction ~ testEdtServerAction");
+}
