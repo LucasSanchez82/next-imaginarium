@@ -20,14 +20,17 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import { Categorie } from "@prisma/client";
 import { useState } from "react";
 
 function Calendar({
   idEnfant,
   calendarEvents: calendarEventsInitial,
+  categories
 }: {
   idEnfant: number;
   calendarEvents: EventInput;
+  categories: Categorie[]
 }) {
   const [calendarState, setCalendarState] = useState<{
     showModal: boolean;
@@ -170,9 +173,6 @@ function Calendar({
 
   return (
     <div>
-      <Button onClick={() => console.log(calendarEventsInitial)}>
-        clique moi
-      </Button>
       <Fullcalendar
         // timeZone="Paris/Europe"
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -202,6 +202,7 @@ function Calendar({
         useDates={{ dates: calendarState.currDate, setDates: setCurrDate }}
         deleteCalendarEvent={deleteCalendarEvent}
         updateEvenementToDb={updateEvenementToDb}
+        categories={categories}
       />
     </div>
   );

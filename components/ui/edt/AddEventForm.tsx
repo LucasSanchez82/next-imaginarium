@@ -4,11 +4,14 @@ import { DialogFooter } from "@/components/ui/dialog";
 import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import { EventImpl } from "@fullcalendar/core/internal";
 import { Trash2 } from "lucide-react";
+import { ChangeEvent, PropsWithChildren } from "react";
+import { useFormStatus } from "react-dom";
 import AutoForm from "../auto-form";
 import { toast } from "../use-toast";
-import { useFormStatus } from "react-dom";
-import { PropsWithChildren, useEffect } from "react";
-import { testEdtServerAction } from "@/components/actions/edt";
+import { parse } from "path";
+import { Categorie } from "@prisma/client";
+import { Checkbox } from "../checkbox";
+import { CategorieCheckBoxForm } from "./categorieCheckBoxForm";
 
 const SubmitButton = ({ children }: PropsWithChildren) => {
   const { pending, data } = useFormStatus();
@@ -27,9 +30,48 @@ export function AddEventForm(props: {
     end?: Date;
   };
   setDates: (dates: { start: Date; end?: Date }) => void;
-  handleSubmit: (values: CalendarEvent) => Promise<void>;
+  handleAddUpdateEvent: (values: CalendarEvent) => Promise<void>;
   handleDelete: () => Promise<void>;
+  categories: Categorie[];
 }) {
+  const handleAction = async (e: FormData) => {
+    const obj = Object.fromEntries(e);
+    const { start, end, description, title, ...other } = obj;
+
+    const parsedEvent = eventSchema.safeParse({
+      description,
+      title,
+      start: props.dates.start,
+      end: props.dates.end,
+    });
+
+    if (parsedEvent.success) {
+      const { start, end, description, title } = parsedEvent.data;
+      try {
+        await props.handleAddUpdateEvent({
+          end,
+          start,
+          description,
+          title,
+          id: Number(props.updateEvent?._def.publicId) || undefined,
+        });
+      } catch (error) {
+        toast({
+          title: "Erreur, impossible d'ajouter l'évènement",
+          description: "Erreur coté serveur",
+          variant: "destructive",
+        });
+      }
+    } else {
+      console.log(parsedEvent.error);
+
+      toast({
+        title: "Erreur, impossible d'ajouter l'évènement",
+        description: "Erreur type coté client",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <>
       <AutoForm
@@ -42,32 +84,10 @@ export function AddEventForm(props: {
           })
         }
         formSchema={eventSchema}
-        // onSubmit={() => {console.log("submit")}}
-        action={async (e) => {
-          console.log(Object.fromEntries(e));
-          console.log(e.get("start"));
-          const parsedEvent = eventSchema.safeParse({
-            ...Object.fromEntries(e),
-            start: props.dates.start,
-            end: props.dates.end,
-          });
-
-          if (parsedEvent.success) {
-            try {
-              await props.handleSubmit({
-                ...parsedEvent.data,
-                description: parsedEvent.data.description || null,
-                id: Number(props.updateEvent?._def.publicId) || undefined,
-              });
-            } catch (error) {
-              toast({
-                title: "Erreur, impossible d'ajouter l'évènement",
-                description: "Erreur coté serveur",
-                variant: "destructive",
-              });
-            }
-          }
+        onSubmit={(e) => {
+          console.log("submit", e);
         }}
+        action={handleAction}
         values={{
           title: props.updateEvent?._def.title,
           description: props.updateEvent?._def.extendedProps.description,
@@ -101,14 +121,11 @@ export function AddEventForm(props: {
               required: false,
             },
           },
+          
         }}
       >
+        <CategorieCheckBoxForm />
         <DialogFooter className=" w-full flex items-around justify-around">
-          {/* {props.updateEvent && (
-          <Button type="button" onClick={props.handleDelete}>
-            <Trash2 color="#e22222" />
-          </Button>
-        )} */}
           <SubmitButton />
         </DialogFooter>
       </AutoForm>

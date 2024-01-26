@@ -11,15 +11,15 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
+  id         String    @id @default(uuid())
   name       String
-  email      String   @unique
+  email      String    @unique
   password   String
-  isAdmin    Boolean  @default(false)
-  isVerified Boolean  @default(false)
+  isAdmin    Boolean   @default(false)
+  isVerified Boolean   @default(false)
   image      String?
-  createdAt  DateTime @default(now()) @db.Timestamp()
-  updatedAt  DateTime? @db.Timestamp() @updatedAt
+  createdAt  DateTime  @default(now()) @db.Timestamp()
+  updatedAt  DateTime? @updatedAt @db.Timestamp()
 
   enfant Enfant[]
 
@@ -55,10 +55,10 @@ model EdtSemaine {
 }
 
 model EdtJour {
-  id                     Int                  @id @default(autoincrement())
-  date                   DateTime             @db.Timestamp()
-  idSemaine Int
-  edtSemaine   EdtSemaine @relation(fields: [idSemaine], references: [id])
+  id         Int        @id @default(autoincrement())
+  date       DateTime   @db.Timestamp()
+  idSemaine  Int
+  edtSemaine EdtSemaine @relation(fields: [idSemaine], references: [id])
 
   sequencesJournee Evenement[] // Relation avec les séquences de la journée
 }
@@ -66,39 +66,26 @@ model EdtJour {
 model Evenement {
   id          Int      @id @default(autoincrement())
   dateDebut   DateTime @db.Timestamp()
-  dateFin     DateTime @db.Timestamp() @default(now())
+  dateFin     DateTime @default(now()) @db.Timestamp()
   titre       String   @db.TinyText
   description String?
 
   idJour   Int
   idEnfant Int
+  idCategorie Int?
 
   enfant Enfant  @relation(fields: [idEnfant], references: [id])
   jour   EdtJour @relation(fields: [idJour], references: [id])
-
-  categories EvenementCategorie[]
+  categorie Categorie? @relation(fields: [idCategorie], references: [id])
 }
 
 model Categorie {
-  id          Int        @id @default(autoincrement())
-  libelle     String
+  id          Int     @id @default(autoincrement())
+  libelle     String @unique
   description String?
   couleur     String?
+  important   Boolean @default(false)
 
-  evenements EvenementCategorie[]
+  evenements Evenement[]
 }
-
-model EvenementCategorie {
-  evenement  Evenement @relation(fields: [evenementId], references: [id])
-  categorie  Categorie @relation(fields: [categorieId], references: [id])
-
-  evenementId Int
-  categorieId Int
-
-  @@id([evenementId, categorieId])
-}
-
-
-
-
 // ...

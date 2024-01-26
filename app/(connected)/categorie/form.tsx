@@ -1,12 +1,12 @@
 "use client";
 
-import { addCategorieToDb } from "@/components/actions/categorie";
 import AutoForm from "@/components/ui/auto-form";
 import { categorieSchema } from "./zodSchemas";
 import { SubmitButton } from "./submitButton";
 import { Button } from "@/components/ui/button";
+import { addCategorieToDb } from "@/components/actions/categorie";
 
-const Form = ({ className }: { className?: string }) => {
+const FormCategorie= ({ className }: { className?: string }) => {
   return (
     <AutoForm
       action={addCategorieToDb}
@@ -21,6 +21,9 @@ const Form = ({ className }: { className?: string }) => {
             type: "color",
           },
         },
+        important: {
+          fieldType: "switch",
+        },
       }}
     >
       <Button type="submit">Envoyer</Button>
@@ -28,4 +31,4 @@ const Form = ({ className }: { className?: string }) => {
   );
 };
 
-export default Form;
+export default FormCategorie;

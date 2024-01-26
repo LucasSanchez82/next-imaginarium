@@ -1,5 +1,9 @@
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
-
+const categoriesLibelles = async () => {
+  const categories = await prisma.categorie.findMany();
+  return categories.map((categorie) => categorie.libelle);
+};
 const eventSchemaBase = z.object({
   title: z
     .string({ required_error: "Obligatoire" })
@@ -16,19 +20,9 @@ const eventSchemaBase = z.object({
 const eventSchema = eventSchemaBase
   .extend({
     start: z.date().describe("Date de début de l'événement"),
-    end: z.date().describe("Date de fin de l'événement"),
+    end: z.date().describe("Date de fin de l'événement")
   })
   .refine((data) => data.start < data.end, {
-    message: "La date de début doit être avant la date de fin",
-    path: ["dateDebut", "dateFin"],
-  });
-
-export const eventSchemaDateToString = eventSchemaBase
-  .extend({
-    start: z.string().datetime().describe("Date de début de l'événement"),
-    end: z.string().datetime().describe("Date de fin de l'événement"),
-  })
-  .refine((data) => new Date(data.start) < new Date(data.end), {
     message: "La date de début doit être avant la date de fin",
     path: ["dateDebut", "dateFin"],
   });

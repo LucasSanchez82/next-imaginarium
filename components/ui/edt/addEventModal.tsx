@@ -4,14 +4,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  CalendarEvent
-} from "@/components/zodSchemas/event";
+import { CalendarEvent } from "@/components/zodSchemas/event";
 import { dateResetOffset } from "@/lib/dateUtils";
 import { EventImpl } from "@fullcalendar/core/internal";
-import { Evenement } from "@prisma/client";
+import { Categorie, Evenement } from "@prisma/client";
 import { toast } from "../use-toast";
 import { AddEventForm } from "./AddEventForm";
+import { useEffect } from "react";
 
 export function AddEventModal({
   open,
@@ -21,8 +20,10 @@ export function AddEventModal({
   useDates,
   deleteCalendarEvent,
   updateEvenementToDb,
+  categories,
 }: {
   open: boolean;
+  categories: Categorie[];
   setOpen: (open: boolean) => void;
   addCalendarEvent: (event: CalendarEvent) => Promise<void>;
   useUpdateEvent: {
@@ -49,8 +50,12 @@ export function AddEventModal({
 }) {
   const { updateEvent, resetUpdate } = useUpdateEvent;
   const { dates, setDates } = useDates;
-
-  const handleSubmit = async (values: CalendarEvent) => {
+  useEffect(() => {
+    if (!open) {
+      resetUpdate();
+    }
+  }, [open]);
+  const handleAddUpdateEvent = async (values: CalendarEvent) => {
     if (updateEvent?.title) {
       const {
         end: dateFin,
@@ -89,14 +94,12 @@ export function AddEventModal({
       console.log({ start, end });
       await addCalendarEvent({ ...values });
     }
-    resetUpdate();
     setOpen(false);
   };
 
   const handleDelete = async () => {
     await deleteCalendarEvent();
     setOpen(false);
-    resetUpdate();
   };
   return (
     <Dialog
@@ -105,7 +108,7 @@ export function AddEventModal({
         setOpen(isOpen);
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[50vw] sm:max-h-[95vh] overflow-auto ">
         <DialogHeader>
           <DialogTitle>
             {updateEvent ? "Modifier l'évènement" : "Ajouter un évènement"}
@@ -115,8 +118,9 @@ export function AddEventModal({
           updateEvent={updateEvent}
           dates={dates}
           setDates={setDates}
-          handleSubmit={handleSubmit}
+          handleAddUpdateEvent={handleAddUpdateEvent}
           handleDelete={handleDelete}
+          categories={categories}
         />
       </DialogContent>
     </Dialog>
