@@ -27,7 +27,7 @@ export const addCategorieToDb = async (categorieFormData: FormData) => {
     }
 }
 
-export const getCategories = async () => {
+export const getCategoriesFromDb = async () => {
     const categories = await prisma.categorie.findMany()
     console.log("🚀 ~ getCategories ~ categories", categories);
     return categories

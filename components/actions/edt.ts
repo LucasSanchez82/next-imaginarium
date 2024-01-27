@@ -1,6 +1,6 @@
 "use server";
 import { prisma } from "@/lib/prisma";
-import { EdtJour, EdtSemaine, Evenement } from "@prisma/client";
+import { EdtJour, EdtSemaine, Evenement, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const getFirstDayOfWeek = (dayInitial: Date) => {
@@ -89,14 +89,20 @@ export const addEvenementToDb = async (
   path?: string
 ) => {
   const evenement = { ...evenementInitial };
-
-  const edtJour = await getEdtJourByEvenement({ ...evenement });
-
-  const evenementAdded = prisma.evenement.create({
-    data: { ...evenement, idJour: edtJour.id },
+  const isEnfant = await prisma.enfant.findFirst({
+    where: { id: evenement.idEnfant },
   });
-  revalidatePath(path || "/(connected)/enfants/[idEnfant]/edt");
-  return evenementAdded;
+  if (isEnfant) {
+    const edtJour = await getEdtJourByEvenement({ ...evenement });
+
+    const evenementAdded = prisma.evenement.create({
+      data: { ...evenement, idJour: edtJour.id },
+    });
+    revalidatePath(path || "/(connected)/enfants/[idEnfant]/edt");
+    return evenementAdded;
+  } else {
+    throw Error("idEnfant isn't valid");
+  }
 };
 
 export const updateEvenementToDb = async (
@@ -146,4 +152,4 @@ export const deleteEvenementToDb = async (
 
 export const testEdtServerAction = async () => {
   console.log("🚀 ~ testEdtServerAction ~ testEdtServerAction");
-}
+};

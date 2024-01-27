@@ -33,5 +33,6 @@ export type CalendarEvent = {
   description?: string | null;
   start: Date;
   end: Date;
+  idCategorie?: number | null;
 };
 export default eventSchema;

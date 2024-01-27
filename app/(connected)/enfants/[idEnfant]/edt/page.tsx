@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/utils";
 import Calendar from "./calendar";
-import { getCategories } from "@/components/actions/categorie";
+import { getCategoriesFromDb } from "@/components/actions/categorie";
 const page = async ({ params }: { params: { idEnfant: string } }) => {
   const idEnfantNumber = Number(params.idEnfant);
   if (isNaN(idEnfantNumber)) {
@@ -18,7 +18,7 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
   });
 
   const evenements = await prisma.evenement.findMany();
-  const categories = await getCategories();
+  const categories = await getCategoriesFromDb();
 
   if (enfantEdtSemaines) {
     const { nom, prenom } = enfantEdtSemaines;

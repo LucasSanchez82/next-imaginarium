@@ -63,6 +63,7 @@ export function AddEventModal({
         title: titre,
         description,
         id,
+        idCategorie
       } = values;
       if (id) {
         // * UPDATE
@@ -77,6 +78,7 @@ export function AddEventModal({
             titre,
             id,
             description: values.description || null,
+            idCategorie: null,
           },
           "/(connected)/enfants/[idEnfant]/edt/"
         );
