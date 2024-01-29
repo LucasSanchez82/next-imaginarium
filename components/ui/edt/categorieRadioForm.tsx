@@ -1,29 +1,25 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
 
+import { getCategoriesFromDb } from "@/components/actions/categorie";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { toast } from "@/components/ui/use-toast";
+import { Categorie } from "@prisma/client";
 import { useEffect, useState } from "react";
-import { get } from "http";
-import { getCategoriesFromDb } from "@/components/actions/categorie";
-import { set } from "date-fns";
 
 export function CategorieRadioForm({
+  categories,
   categorie,
   setCategorie,
 }: {
+  categories: Categorie[];
   categorie: string | null;
   setCategorie: (categories: string) => void;
 }) {
@@ -38,7 +34,7 @@ export function CategorieRadioForm({
   return (
       <form
         onChange={(e) =>
-          e.target instanceof HTMLInputElement && console.log(e.target.value)
+          e.target instanceof HTMLInputElement && setCategorie(e.target.value)
         }
         className="w-2/3 space-y-6"
       >
@@ -46,7 +42,7 @@ export function CategorieRadioForm({
           name="type"
           render={({ field }) => (
             <FormItem className="space-y-3">
-              <FormLabel>Notify me about...</FormLabel>
+              <FormLabel>Categorie : </FormLabel>
               <FormControl>
                 <RadioGroup
                   onValueChange={(value) => setCategorie(value)}
@@ -54,20 +50,20 @@ export function CategorieRadioForm({
                   className="flex flex-col space-y-1"
                 >
                   {
-                    allCategoriesFromDb?.map((categorie) => (
+                    categories.map((categorie) => (
                       <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value={categorie} />
+                          <RadioGroupItem value={String(categorie.id)} />
                         </FormControl>
                         <FormLabel className="font-normal">
-                          {categorie}
+                          {categorie.libelle} {(categorie.important && '⚠️')}
                         </FormLabel>
                       </FormItem>
                     ))
                   }
                   <FormItem className="flex items-center space-x-3 space-y-0">
                         <FormControl>
-                          <RadioGroupItem value={'null'} />
+                          <RadioGroupItem value={''} />
                         </FormControl>
                         <FormLabel className="font-normal">
                           'aucune'
@@ -79,7 +75,6 @@ export function CategorieRadioForm({
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
       </form>
   );
 }

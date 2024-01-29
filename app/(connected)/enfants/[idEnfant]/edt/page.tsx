@@ -1,6 +1,8 @@
+import { getCategoriesFromDb } from "@/components/actions/categorie";
 import { prisma } from "@/lib/utils";
 import Calendar from "./calendar";
-import { getCategoriesFromDb } from "@/components/actions/categorie";
+import { EventInput } from "@fullcalendar/core";
+import { CategorieUsedEvent } from "./categoryUsedEvent";
 const page = async ({ params }: { params: { idEnfant: string } }) => {
   const idEnfantNumber = Number(params.idEnfant);
   if (isNaN(idEnfantNumber)) {
@@ -17,31 +19,45 @@ const page = async ({ params }: { params: { idEnfant: string } }) => {
     },
   });
 
-  const evenements = await prisma.evenement.findMany();
+  const evenements = await prisma.evenement.findMany({
+    select: {
+      id: true,
+      titre: true,
+      description: true,
+      dateDebut: true,
+      dateFin: true,
+      categorie: {
+        select: {
+          id: true,
+          couleur: true,
+        },
+      },
+    },
+    where: { idEnfant: idEnfantNumber },
+  });
   const categories = await getCategoriesFromDb();
 
   if (enfantEdtSemaines) {
     const { nom, prenom } = enfantEdtSemaines;
     return (
       <>
-        <h1>hello schedule</h1>
+        <h1>Calendrier de {prenom + " " + nom}</h1>
         <Calendar
           calendarEvents={evenements.map(
             (
               curr
-            ): {
-              id: string;
-              title: string;
-              description: string | null;
-              start: Date;
-              end: Date;
-            } => ({
+            ) => ({
               id: String(curr.id),
               title: curr.titre,
               description: curr.description,
               start: curr.dateDebut,
               end: curr.dateFin,
-            })
+              backgroundColor: curr?.categorie?.couleur,
+              extendedProps: {
+                categorie: curr.categorie,
+              }
+
+            } as EventInput & CategorieUsedEvent & {backgroundColor?: string;} )
           )}
           idEnfant={idEnfantNumber}
           categories={categories}

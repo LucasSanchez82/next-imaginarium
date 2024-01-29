@@ -110,11 +110,11 @@ export const updateEvenementToDb = async (
   path?: string
 ) => {
   try {
-    const { dateDebut, dateFin, id, description, titre } = evenement; // get only pertinents datas
+    const { dateDebut, dateFin, id, description, titre, idCategorie } = evenement; // get only pertinents datas
 
     const evenementUpdated = await prisma.evenement.update({
       where: { id },
-      data: { titre, description, dateDebut, dateFin, id },
+      data: { titre, description, dateDebut, dateFin, id, idCategorie },
     });
 
     revalidatePath(path || "/(connected)/enfants/[idEnfant]/edt");

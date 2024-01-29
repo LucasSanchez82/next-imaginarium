@@ -11,6 +11,7 @@ import { Categorie, Evenement } from "@prisma/client";
 import { toast } from "../use-toast";
 import { AddEventForm } from "./AddEventForm";
 import { useEffect } from "react";
+import { CategorieUsedEvent } from "@/app/(connected)/enfants/[idEnfant]/edt/categoryUsedEvent";
 
 export function AddEventModal({
   open,
@@ -21,8 +22,10 @@ export function AddEventModal({
   deleteCalendarEvent,
   updateEvenementToDb,
   categories,
+  categorie,
 }: {
   open: boolean;
+  categorie: null | CategorieUsedEvent;
   categories: Categorie[];
   setOpen: (open: boolean) => void;
   addCalendarEvent: (event: CalendarEvent) => Promise<void>;
@@ -54,6 +57,7 @@ export function AddEventModal({
     if (!open) {
       resetUpdate();
     }
+    console.log({categorie})
   }, [open]);
   const handleAddUpdateEvent = async (values: CalendarEvent) => {
     if (updateEvent?.title) {
@@ -71,14 +75,14 @@ export function AddEventModal({
         updateEvent.setExtendedProp("description", values.description);
         updateEvent.setStart(values.start);
         updateEvent.setEnd(values.end);
-        await updateEvenementToDb(
+        const updatedEvent = await updateEvenementToDb(
           {
             dateDebut,
             dateFin,
             titre,
             id,
             description: values.description || null,
-            idCategorie: null,
+            idCategorie: idCategorie || null,
           },
           "/(connected)/enfants/[idEnfant]/edt/"
         );
@@ -93,7 +97,6 @@ export function AddEventModal({
       // * CREATE
       const start = dateResetOffset(values.start).toISOString();
       const end = dateResetOffset(values.end).toISOString();
-      console.log({ start, end });
       await addCalendarEvent({ ...values });
     }
     setOpen(false);

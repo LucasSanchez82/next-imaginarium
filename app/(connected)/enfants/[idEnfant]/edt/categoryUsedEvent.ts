@@ -1,0 +1,1 @@
+export type CategorieUsedEvent = { extendedProps: { categorie: { id: number; couleur: string | null }}}

@@ -4,7 +4,6 @@ import {
   deleteEvenementToDb,
   updateEvenementToDb,
 } from "@/components/actions/edt";
-import { Button } from "@/components/ui/button";
 import { AddEventModal } from "@/components/ui/edt/addEventModal";
 import { useToast } from "@/components/ui/use-toast";
 import { CalendarEvent } from "@/components/zodSchemas/event";
@@ -21,16 +20,17 @@ import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Categorie } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CategorieUsedEvent } from "./categoryUsedEvent";
 
 function Calendar({
   idEnfant,
   calendarEvents: calendarEventsInitial,
-  categories
+  categories,
 }: {
   idEnfant: number;
-  calendarEvents: EventInput;
-  categories: Categorie[]
+  calendarEvents: EventInput & { backgroundColor?: string & CategorieUsedEvent };
+  categories: Categorie[];
 }) {
   const [calendarState, setCalendarState] = useState<{
     showModal: boolean;
@@ -45,32 +45,9 @@ function Calendar({
   });
   const { showModal, updateEvent } = calendarState;
   const { toast } = useToast();
-
-  /**
-   * Adds a new event to the calendar state.
-   * @param {CalendarEvent} event - The event to be added.
-   */
-  const addCalendarEvent = async (event: CalendarEvent) => {
-    try {
-      const addedEvent = await addEvenementToDb(
-        {
-          dateDebut: event.start,
-          dateFin: event.end,
-          description: event.description || null,
-          titre: event.title,
-          idEnfant: idEnfant,
-        },
-        "/(connected)/enfants/[idEnfant]/edt/"
-      );
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de l'ajout de l'évènement.",
-        variant: "destructive",
-      });
-    }
-  };
+  useEffect(() => {
+    console.log({ calendarEventsInitial });
+  })
 
   /**
    * Sets the visibility of the modal.
@@ -92,7 +69,6 @@ function Calendar({
   };
 
   const resetUpdate = () => setUpdateEvent(null);
-
 
   const deleteCalendarEvent = async () => {
     try {
@@ -151,26 +127,63 @@ function Calendar({
     setShowModal(true);
   };
 
-  const handleEventChange = async (event: EventChangeArg) => {
+  const handleEventChange = async (
+    event: EventChangeArg,
+    idCategorie: null | number = null
+  ) => {
     const dates = event.event.start &&
       event.event.end && { start: event.event.start, end: event.event.end };
     const id = Number(event.event._def.publicId);
     const titre = event.event._def.title;
     const description = event.event._def.extendedProps.description || null;
     if (dates && id) {
-      await updateEvenementToDb(
-        {
-          id,
-          dateDebut: dates.start,
-          dateFin: dates.end,
-          description,
-          titre,
-        },
-        "/(connected)/enfants/[idEnfant]/edt/"
-      );
+      try {
+        const awaitedEvent =  await updateEvenementToDb(
+          {
+            id,
+            dateDebut: dates.start,
+            dateFin: dates.end,
+            description,
+            titre,
+            idCategorie,
+          },
+          "/(connected)/enfants/[idEnfant]/edt/"
+        );
+        console.log({ awaitedEvent })
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
+  /**
+   * Adds a new event to the calendar state.
+   * @param {CalendarEvent} event - The event to be added.
+   */
+  const addCalendarEvent = async (event: CalendarEvent) => {
+    try {
+      const addedEvent = await addEvenementToDb(
+        {
+          dateDebut: event.start,
+          dateFin: event.end,
+          titre: event.title,
+          idEnfant: idEnfant,
+          description: event.description || null,
+          idCategorie: event.idCategorie || null,
+        },
+        "/(connected)/enfants/[idEnfant]/edt/"
+      );
+      console.log("addedEvent", addedEvent);
+      console.log("event.idCategorie", event.idCategorie);
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'ajout de l'évènement.",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <div>
       <Fullcalendar
@@ -203,6 +216,7 @@ function Calendar({
         deleteCalendarEvent={deleteCalendarEvent}
         updateEvenementToDb={updateEvenementToDb}
         categories={categories}
+        categorie={calendarState.updateEvent?.extendedProps.categorie || null}
       />
     </div>
   );

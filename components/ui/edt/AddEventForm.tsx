@@ -3,16 +3,13 @@ import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import eventSchema, { CalendarEvent } from "@/components/zodSchemas/event";
 import { EventImpl } from "@fullcalendar/core/internal";
+import { Categorie } from "@prisma/client";
 import { Trash2 } from "lucide-react";
-import { ChangeEvent, PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { useFormStatus } from "react-dom";
 import AutoForm from "../auto-form";
 import { toast } from "../use-toast";
-import { parse } from "path";
-import { Categorie } from "@prisma/client";
-import { Checkbox } from "../checkbox";
 import { CategorieRadioForm } from "./categorieRadioForm";
-import { Label } from "../label";
 
 const SubmitButton = ({ children }: PropsWithChildren) => {
   const { pending, data } = useFormStatus();
@@ -35,7 +32,10 @@ export function AddEventForm(props: {
   handleDelete: () => Promise<void>;
   categories: Categorie[];
 }) {
-  const [categorie, setCategorie] = useState<null | string>(null)
+  const [categorie, setCategorie] = useState<string | null>(null);
+  useEffect(() => {
+    console.log({ updateEvent: props.updateEvent })
+  }, [categorie])
   const handleAction = async (e: FormData) => {
     const obj = Object.fromEntries(e);
     const { start, end, description, title, ...other } = obj;
@@ -49,6 +49,7 @@ export function AddEventForm(props: {
 
     if (parsedEvent.success) {
       const { start, end, description, title } = parsedEvent.data;
+      console.log("categorie", categorie);
       try {
         await props.handleAddUpdateEvent({
           end,
@@ -56,6 +57,7 @@ export function AddEventForm(props: {
           description,
           title,
           id: Number(props.updateEvent?._def.publicId) || undefined,
+          idCategorie: Number(categorie) || undefined,
         });
       } catch (error) {
         toast({
@@ -65,13 +67,7 @@ export function AddEventForm(props: {
         });
       }
     } else {
-      console.log(parsedEvent.error);
-
-      toast({
-        title: "Erreur, impossible d'ajouter l'évènement",
-        description: "Erreur type coté client",
-        variant: "destructive",
-      });
+      console.error(parsedEvent.error);
     }
   };
   return (
@@ -123,12 +119,17 @@ export function AddEventForm(props: {
               required: false,
             },
           },
-          
         }}
       >
-        <CategorieRadioForm categorie={categorie} setCategorie={setCategorie} />
+        <CategorieRadioForm
+          categorie={categorie}
+          setCategorie={setCategorie}
+          categories={props.categories}
+        />
         <DialogFooter className=" w-full flex items-around justify-around">
-          <SubmitButton />
+          <SubmitButton>
+            {props.updateEvent ? "Modifier" : "Ajouter"}
+          </SubmitButton>
         </DialogFooter>
       </AutoForm>
 
