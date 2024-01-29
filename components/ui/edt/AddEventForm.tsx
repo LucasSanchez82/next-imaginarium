@@ -33,9 +33,6 @@ export function AddEventForm(props: {
   categories: Categorie[];
 }) {
   const [categorie, setCategorie] = useState<string | null>(null);
-  useEffect(() => {
-    console.log({ updateEvent: props.updateEvent })
-  }, [categorie])
   const handleAction = async (e: FormData) => {
     const obj = Object.fromEntries(e);
     const { start, end, description, title, ...other } = obj;
@@ -49,7 +46,6 @@ export function AddEventForm(props: {
 
     if (parsedEvent.success) {
       const { start, end, description, title } = parsedEvent.data;
-      console.log("categorie", categorie);
       try {
         await props.handleAddUpdateEvent({
           end,
@@ -82,9 +78,6 @@ export function AddEventForm(props: {
           })
         }
         formSchema={eventSchema}
-        onSubmit={(e) => {
-          console.log("submit", e);
-        }}
         action={handleAction}
         values={{
           title: props.updateEvent?._def.title,
@@ -122,7 +115,6 @@ export function AddEventForm(props: {
         }}
       >
         <CategorieRadioForm
-          categorie={categorie}
           setCategorie={setCategorie}
           categories={props.categories}
         />

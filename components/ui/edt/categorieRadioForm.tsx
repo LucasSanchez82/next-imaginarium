@@ -1,6 +1,7 @@
 "use client";
 
 
+import { useStoreCategorie } from "@/app/(connected)/enfants/[idEnfant]/edt/useStoreCategorie";
 import { getCategoriesFromDb } from "@/components/actions/categorie";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,16 +17,15 @@ import { useEffect, useState } from "react";
 
 export function CategorieRadioForm({
   categories,
-  categorie,
   setCategorie,
 }: {
   categories: Categorie[];
-  categorie: string | null;
   setCategorie: (categories: string) => void;
 }) {
   const [allCategoriesFromDb, setAllCategoriesFromDb] = useState<
     string[] | null
   >(null);
+  const {categorie} = useStoreCategorie()
   useEffect(() => {
     getCategoriesFromDb().then((categories) =>
       setAllCategoriesFromDb(categories.map((categorie) => categorie.libelle))
@@ -46,7 +46,7 @@ export function CategorieRadioForm({
               <FormControl>
                 <RadioGroup
                   onValueChange={(value) => setCategorie(value)}
-                  defaultValue={field.value}
+                  defaultValue={categorie?.id ? String(categorie.id) : ''}
                   className="flex flex-col space-y-1"
                 >
                   {

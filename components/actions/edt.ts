@@ -40,18 +40,9 @@ const addEdtJour = async (
   try {
     const firstDay = getFirstDayOfWeek(edtJour.date);
     const semaine = await getEdtSemaineByDate(firstDay);
-    console.log(
-      "addEdtJour -> debut semaine 🚀",
-      edtJour.date.toLocaleString()
-    );
     const edtJourAdded = await prisma.edtJour.create({
       data: { date: edtJour.date.toISOString(), idSemaine: semaine.id },
     });
-    console.log(
-      "🚀 ~  data: { date: edtJour.date.toISOString(), idSemaine: semaine.id }:",
-      { date: edtJour.date.toISOString(), idSemaine: semaine.id }
-    );
-    console.log("🚀 ~ edtJourAdded:", edtJourAdded);
     revalidatePath("/api/edt");
     return edtJourAdded;
   } catch (error) {
@@ -66,15 +57,11 @@ const getEdtJourByEvenement = async (
   const dateWithoutHours = new Date(
     new Date(evenement.dateDebut).setHours(0, 0, 0, 0)
   );
-  console.log("dateWithoutHours🚀", dateWithoutHours);
-
   const edtJour = await prisma.edtJour.findFirst({
     where: {
       date: dateWithoutHours,
     },
   });
-  console.log("🚀 ~ edtJour:", edtJour);
-  // throw Error('test');
 
   if (edtJour) {
     return edtJour;
@@ -148,8 +135,4 @@ export const deleteEvenementToDb = async (
       "🚀 ~ deleteEvenementToDb ~ error: \n " + JSON.stringify(error)
     );
   }
-};
-
-export const testEdtServerAction = async () => {
-  console.log("🚀 ~ testEdtServerAction ~ testEdtServerAction");
 };

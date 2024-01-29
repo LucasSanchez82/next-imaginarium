@@ -1,10 +1,9 @@
 "use client";
 
-import AutoForm from "@/components/ui/auto-form";
-import { categorieSchema } from "./zodSchemas";
-import { SubmitButton } from "./submitButton";
-import { Button } from "@/components/ui/button";
 import { addCategorieToDb } from "@/components/actions/categorie";
+import AutoForm from "@/components/ui/auto-form";
+import { Button } from "@/components/ui/button";
+import { categorieSchema } from "./zodSchemas";
 
 const FormCategorie= ({ className }: { className?: string }) => {
   return (

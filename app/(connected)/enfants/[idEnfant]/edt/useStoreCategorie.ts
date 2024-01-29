@@ -1,9 +1,11 @@
-import { create } from 'zustand';
-import {CategorieUsedEvent} from './categoryUsedEvent'
-export const useStoreCategorie = create((set, get): {
-  categorie: CategorieUsedEvent | null;
-  setCategorie: (categorie: CategorieUsedEvent) => void;
-} => ({
+import { create } from "zustand";
+import { CategorieUsedEventWithoutExtendedProps } from "./categoryUsedEvent";
+
+
+export const useStoreCategorie = create<{
+  categorie: CategorieUsedEventWithoutExtendedProps | null;
+  setCategorie: (categorie: CategorieUsedEventWithoutExtendedProps | null) => void;
+}>((set, get) => ({
   categorie: null,
   setCategorie(categorie) {
     set({ categorie });

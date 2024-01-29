@@ -1,4 +1,8 @@
 import {
+  CategorieUsedEventWithoutExtendedProps
+} from "@/app/(connected)/enfants/[idEnfant]/edt/categoryUsedEvent";
+import { useStoreCategorie } from "@/app/(connected)/enfants/[idEnfant]/edt/useStoreCategorie";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -8,10 +12,9 @@ import { CalendarEvent } from "@/components/zodSchemas/event";
 import { dateResetOffset } from "@/lib/dateUtils";
 import { EventImpl } from "@fullcalendar/core/internal";
 import { Categorie, Evenement } from "@prisma/client";
+import { useEffect } from "react";
 import { toast } from "../use-toast";
 import { AddEventForm } from "./AddEventForm";
-import { useEffect } from "react";
-import { CategorieUsedEvent } from "@/app/(connected)/enfants/[idEnfant]/edt/categoryUsedEvent";
 
 export function AddEventModal({
   open,
@@ -25,7 +28,7 @@ export function AddEventModal({
   categorie,
 }: {
   open: boolean;
-  categorie: null | CategorieUsedEvent;
+  categorie: null | CategorieUsedEventWithoutExtendedProps;
   categories: Categorie[];
   setOpen: (open: boolean) => void;
   addCalendarEvent: (event: CalendarEvent) => Promise<void>;
@@ -53,11 +56,17 @@ export function AddEventModal({
 }) {
   const { updateEvent, resetUpdate } = useUpdateEvent;
   const { dates, setDates } = useDates;
+  const { setCategorie } = useStoreCategorie();
+
   useEffect(() => {
     if (!open) {
       resetUpdate();
     }
-    console.log({categorie})
+    try {
+      setCategorie(categorie ? { ...categorie } : null);
+    } catch (error) {
+      console.error(error);
+    }
   }, [open]);
   const handleAddUpdateEvent = async (values: CalendarEvent) => {
     if (updateEvent?.title) {
@@ -67,7 +76,7 @@ export function AddEventModal({
         title: titre,
         description,
         id,
-        idCategorie
+        idCategorie,
       } = values;
       if (id) {
         // * UPDATE

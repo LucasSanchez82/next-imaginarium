@@ -20,7 +20,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Categorie } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CategorieUsedEvent } from "./categoryUsedEvent";
 
 function Calendar({
@@ -45,9 +45,6 @@ function Calendar({
   });
   const { showModal, updateEvent } = calendarState;
   const { toast } = useToast();
-  useEffect(() => {
-    console.log({ calendarEventsInitial });
-  })
 
   /**
    * Sets the visibility of the modal.
@@ -138,7 +135,7 @@ function Calendar({
     const description = event.event._def.extendedProps.description || null;
     if (dates && id) {
       try {
-        const awaitedEvent =  await updateEvenementToDb(
+        await updateEvenementToDb(
           {
             id,
             dateDebut: dates.start,
@@ -149,7 +146,6 @@ function Calendar({
           },
           "/(connected)/enfants/[idEnfant]/edt/"
         );
-        console.log({ awaitedEvent })
       } catch (error) {
         console.error(error);
       }
@@ -173,8 +169,6 @@ function Calendar({
         },
         "/(connected)/enfants/[idEnfant]/edt/"
       );
-      console.log("addedEvent", addedEvent);
-      console.log("event.idCategorie", event.idCategorie);
     } catch (error) {
       console.error(error);
       toast({
