@@ -3,7 +3,6 @@
 
 import { useStoreCategorie } from "@/app/(connected)/enfants/[idEnfant]/edt/useStoreCategorie";
 import { getCategoriesFromDb } from "@/components/actions/categorie";
-import { Button } from "@/components/ui/button";
 import {
   FormControl,
   FormField,
@@ -50,8 +49,8 @@ export function CategorieRadioForm({
                   className="flex flex-col space-y-1"
                 >
                   {
-                    categories.map((categorie) => (
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                    categories.map((categorie, key) => (
+                      <FormItem key={key} className="flex items-center space-x-3 space-y-0">
                         <FormControl>
                           <RadioGroupItem value={String(categorie.id)} />
                         </FormControl>
@@ -66,7 +65,7 @@ export function CategorieRadioForm({
                           <RadioGroupItem value={''} />
                         </FormControl>
                         <FormLabel className="font-normal">
-                          'aucune'
+                          {'aucune'}
                         </FormLabel>
                       </FormItem>
                 </RadioGroup>

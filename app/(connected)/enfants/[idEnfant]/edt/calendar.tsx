@@ -17,6 +17,7 @@ import { EventImpl } from "@fullcalendar/core/internal";
 import frLocale from "@fullcalendar/core/locales/fr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from '@fullcalendar/list'
 import Fullcalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { Categorie } from "@prisma/client";
@@ -182,12 +183,12 @@ function Calendar({
     <div>
       <Fullcalendar
         // timeZone="Paris/Europe"
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
         initialView={"dayGridMonth"}
         headerToolbar={{
           start: "today prev,next", // will normally be on the left. if RTL, will be on the right
           center: "title",
-          end: "dayGridMonth,timeGridWeek,timeGridDay", // will normally be on the right. if RTL, will be on the left
+          end: "dayGridMonth,timeGridWeek,timeGridDay,listWeek", // will normally be on the right. if RTL, will be on the left
         }}
         height={"90vh"}
         selectable={true}
@@ -197,6 +198,7 @@ function Calendar({
         locale={frLocale}
         editable={true}
         eventChange={handleEventChange}
+        themeSystem="shadcn"
       />
       <AddEventModal
         open={showModal}
