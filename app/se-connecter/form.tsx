@@ -5,7 +5,6 @@ import { loginSchema } from "@/lib/schemas/authSchemas";
 import { loginType } from "@/lib/types/authTypes";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React from "react";
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
