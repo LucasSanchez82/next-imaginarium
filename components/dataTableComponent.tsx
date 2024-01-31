@@ -14,7 +14,10 @@ import {
 import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getSpecificEnfants } from "./actions/enfant";
+import { deleteEnfantServer, getSpecificEnfants } from "./actions/enfant";
+import { Button } from "./ui/button";
+import { SubmitButton } from "./submitButton";
+import { useToast } from "./ui/use-toast";
 
 export function TableEnfant({
   enfants,
@@ -33,6 +36,7 @@ export function TableEnfant({
   const [nbPages, setNbPages] = useState(initialNbPages);
   const [searchEnfant, setSearchEnfant] = useState("");
   const [isMounted, setIsMounted] = useState(false);
+  const {toast} = useToast();
 
   const reloadVisibleEnfants = async (refreshNbPages = false) => {
     //s'occupe d'actualiser le tableau d'enfants
@@ -89,6 +93,7 @@ export function TableEnfant({
             <TableHead>documents</TableHead>
             <TableHead>referent</TableHead>
             <TableHead>emploi du temps</TableHead>
+            <TableHead>Supprimer</TableHead>
           </TableRow>
         </TableHeader>
         {
@@ -116,6 +121,28 @@ export function TableEnfant({
                   >
                     calendrier
                   </Link>
+                </TableCell>
+                <TableCell>
+                  <form action={async () => {
+                    try{
+                      const deletedEnfant = await deleteEnfantServer(enfant.id);
+                      toast({
+                        variant: "default",
+                        title: deletedEnfant || "Enfant supprime",
+                      })
+                      reloadVisibleEnfants();
+                    }catch(e){
+                      toast({
+                        variant: "destructive",
+                        title: "Erreur",
+                        description: e ? String(e) : "Erreur serveur",
+                      })
+                    }
+                  }}>
+                    <SubmitButton>
+                      Supprimer
+                    </SubmitButton>
+                  </form>
                 </TableCell>
               </TableRow>
             ))}

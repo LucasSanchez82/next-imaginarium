@@ -2,7 +2,6 @@
 
 import { categorieSchema } from "@/app/(connected)/categorie/zodSchemas"
 import { prisma } from "@/lib/prisma"
-import { Categorie } from "@prisma/client"
 import { revalidatePath } from "next/cache"
 
 export const addCategorieToDb = async (categorieFormData: FormData) => {
@@ -29,6 +28,5 @@ export const addCategorieToDb = async (categorieFormData: FormData) => {
 
 export const getCategoriesFromDb = async () => {
     const categories = await prisma.categorie.findMany()
-    console.log("🚀 ~ getCategories ~ categories", categories);
     return categories
 }

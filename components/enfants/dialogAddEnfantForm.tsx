@@ -11,6 +11,10 @@ import { toast } from "@/components/ui/use-toast";
 import { addEnfantSchema, enfantSchema } from "@/types/enfantSchemas";
 import { addEnfantType, enfantType } from "@/types/enfantType";
 import { useState } from "react";
+import { SubmitButton } from "../submitButton";
+import { log } from "console";
+import { addEnfantServer } from "../actions/enfant";
+import { fi } from "date-fns/locale";
 export function DialogAddEnfantForm({
   reloadVisibleEnfants,
 }: {
@@ -54,6 +58,36 @@ export function DialogAddEnfantForm({
       });
     }
   };
+  const removeNull = <T extends object>(obj: T): T => {
+    const newObj: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== "") {
+        newObj[key] = value;
+      }
+    }
+    return newObj;
+  };
+  const handleAction = async (formdata: FormData) => {
+    const obj = Object.fromEntries(formdata.entries());
+    console.log(obj);
+
+    const values = removeNull(obj as addEnfantType);
+    const [day, month, year] = values.dateNaissance.split("/");
+    const date = new Date(`${year}-${month}-${day}`);
+    const newValues: enfantType = { ...values, dateNaissance: date };
+    const safeValues = enfantSchema.safeParse(newValues);
+
+    if (safeValues.success) {
+      try {
+        await addEnfantServer(safeValues.data);
+      } catch (error) {
+        console.log("🚀 ~ handleAction ~ error:", error);
+      } finally {
+        setOpen(false);
+        reloadVisibleEnfants();
+      }
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -63,10 +97,10 @@ export function DialogAddEnfantForm({
         <DialogHeader>Ajouter un enfant :</DialogHeader>
         <AutoForm
           formSchema={addEnfantSchema}
-          onSubmit={handleSubmit}
+          action={handleAction}
           className="w-2/4 m-auto"
         >
-          <AutoFormSubmit>Ajouter un enfant</AutoFormSubmit>
+          <SubmitButton>Ajouter un enfant</SubmitButton>
         </AutoForm>
       </DialogContent>
     </Dialog>
