@@ -1,7 +1,11 @@
+import { getSpecificEnfants } from "@/components/actions/enfant";
 import { TableEnfant } from "@/components/dataTableComponent";
-import { prisma } from '@/lib/utils';
 import { configRequestEnfantPrismaType } from "@/types/enfantType";
-const page = async () => {
+const page = async ({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] | undefined };
+}) => {
   const limit = { skip: 0, take: 10 };
   const configRequestPrisma: configRequestEnfantPrismaType = {
     select: {
@@ -12,24 +16,25 @@ const page = async () => {
       telephone: true,
       nom: true,
       prenom: true,
-      _count: { select: { document: true} },
+      _count: { select: { document: true } },
       referent: { select: { email: true } },
     },
   };
-  const enfants = await prisma.enfant.findMany({
-    take: limit.take,
-    orderBy: { id: "desc" },
-    ...configRequestPrisma,
-  });
-
-  // const enfantsCount = await prisma.enfant.count();
-  // const nbPages = Math.ceil(enfantsCount / limit.take);
-
+  const searchEnfant =
+    typeof searchParams?.searchEnfant === "string"
+      ? searchParams?.searchEnfant
+      : "";
+  const enfants = await getSpecificEnfants(
+    searchEnfant,
+    limit,
+    false,
+    configRequestPrisma
+  );
   return (
     <>
       <TableEnfant
         configRequestPrisma={configRequestPrisma}
-        enfants={enfants}
+        enfants={enfants?.enfants || []}
         limit={limit}
         nbPages={1}
       />

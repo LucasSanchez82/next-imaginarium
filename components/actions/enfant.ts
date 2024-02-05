@@ -5,6 +5,7 @@ import { prisma } from "@/lib/utils";
 import { enfantSchema } from "@/types/enfantSchemas";
 import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
 import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 export const getSpecificEnfants = async (
   searchEnfant: string,
@@ -97,6 +98,7 @@ export const addEnfantServer = async (values: {
             idReferent: session.user.id,
           },
         });
+        revalidatePath("/enfants");
         return "Enfant ajouté avec succès";
       } catch (error) {
         console.error("Error", error);
@@ -113,25 +115,32 @@ export const addEnfantServer = async (values: {
 export const deleteEnfantServer = async (id: number) => {
   const session = await getServerSession(authOptions);
   if (session?.user) {
-    try {
-      const enfant = await prisma.enfant.findUnique({ where: { id } });
+      let enfant;
+      try{
+        enfant = await prisma.enfant.findUnique({ where: { id } });
+      }catch(error){
+        console.error("🚀 ~ file: enfant.ts:120 ~ deleteEnfantServer ~ error:", error)
+        throw Error("Erreur du serveur à trouver l'enfant par l'identifiant");
+      }
       if (enfant) {
         if((enfant.idReferent === session.user.id) || session.user.isAdmin){
 
-          const deletedEnfant = await prisma.enfant.delete({
-            where: {
-              id,
-            },
-          });
-          return `[${deletedEnfant.prenom} ${deletedEnfant.nom}] supprimé avec succès`;
+          try {
+            const deletedEnfant = await prisma.enfant.delete({
+              where: {
+                id,
+              },
+            });
+            revalidatePath("/enfants");
+            return `[${deletedEnfant.prenom} ${deletedEnfant.nom}] supprimé avec succès`;
+          } catch (error) {
+            console.error("🚀 ~ file: enfant.ts:131 ~ deleteEnfantServer ~ error:", error)
+            throw Error("Erreur du serveur à supprimer l'enfant");
+          }
         }else throw Error("Erreur, vous n'avez pas les droits pour supprimer cet enfant");
       } else {
         throw Error("Erreur, l'enfant n'existe pas");
       }
-    } catch (error) {
-      console.error("Error", error);
-      throw Error("Erreur du serveur à supprimer l'enfant");
-    }
   } else {
     throw Error("Erreur, l'utilisateur doit etre connecte");
   }

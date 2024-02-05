@@ -1,49 +1,47 @@
 "use client";
-import { getEnfant } from "@/types/enfantType";
-import { Dispatch, SetStateAction, SyntheticEvent, useEffect } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { SyntheticEvent, useCallback } from "react";
 
-const SearchBar = ({
-  useEnfant,
-  useLoading,
-  reloadVisibleEnfants,
-  useNbPages,
-}: {
-  reloadVisibleEnfants: (refreshNbPages: boolean) => Promise<void>;
-  useEnfant: {
-    searchEnfant: string;
-    setSearchEnfant: Dispatch<SetStateAction<string>>;
-  };
-  useLoading: {
-    isLoading: boolean;
-    setIsLoading: Dispatch<SetStateAction<boolean>>;
-  };
-  useNbPages: {
-    nbPages: number;
-    setNbPages: Dispatch<SetStateAction<number>>;
-  };
-}) => {
-  const { setSearchEnfant } = useEnfant;
-  const { isLoading } = useLoading;
-  const { setNbPages } = useNbPages;
+const SearchBar = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
+  // Get a new searchParams string by merging the current
+  // searchParams with a provided key/value pair
+  const createQueryString = useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams]
+  );
   const handleSubmit = async (event: SyntheticEvent) => {
     event.preventDefault();
-    reloadVisibleEnfants(true); // true pour actualiser le nombres de pages possibles
+
+    const searchStr =
+      event.target instanceof HTMLFormElement &&
+      new FormData(event.target).get("searchEnfant")?.toString();
+    router.push(
+      pathname + "?" + createQueryString("searchEnfant", searchStr || "")
+    );
   };
   return (
-    <form onSubmit={handleSubmit} className="flex justify-around items-center">
+    <form onSubmit={handleSubmit} className="flex justify-center items-center">
       <input
         type="search"
         placeholder="chercher un enfant..."
         name="searchEnfant"
-        className="bg-secondary rounded p-1"
-        onChange={(event) => setSearchEnfant(event.target.value)}
+        className="bg-secondary rounded p-1 mr-2"
+        autoFocus
       />
       <input
         type="submit"
-        disabled={isLoading}
-        value={isLoading ? "Chargement" : "Rechercher"}
-        className="disabled:bg-secondary disabled:text-primary bg-primary text-secondary rounded cursor-pointer p-1"
+        // disabled={isLoading}
+        value={"Rechercher"}
+        className="disabled:bg-secondary disabled:text-primary bg-primary text-secondary rounded cursor-pointer p-1 ml-2"
       />
     </form>
   );

@@ -15,49 +15,9 @@ import { SubmitButton } from "../submitButton";
 import { log } from "console";
 import { addEnfantServer } from "../actions/enfant";
 import { fi } from "date-fns/locale";
-export function DialogAddEnfantForm({
-  reloadVisibleEnfants,
-}: {
-  reloadVisibleEnfants: (refreshNbPages?: boolean) => Promise<void>;
-}) {
+export function DialogAddEnfantForm() {
   const [open, setOpen] = useState(false);
 
-  const handleSubmit = async (values: addEnfantType) => {
-    const [day, month, year] = values.dateNaissance.split("/");
-    const date = new Date(`${year}-${month}-${day}`);
-    const newValues: enfantType = { ...values, dateNaissance: date };
-    const safeValues = enfantSchema.safeParse(newValues);
-
-    if (safeValues.success) {
-      const { data } = safeValues;
-
-      const response = await fetch("/api/enfants", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      const res = await response.json();
-      if (response.ok) {
-        setOpen(false);
-        await reloadVisibleEnfants();
-        toast({
-          variant: "default",
-          title: res.success || "Enfant ajouté",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erreur",
-          description: res.error || "Erreur serveur",
-        });
-      }
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Informations enfant corrompu",
-        description: safeValues.error.message || ",",
-      });
-    }
-  };
   const removeNull = <T extends object>(obj: T): T => {
     const newObj: any = {};
     for (const [key, value] of Object.entries(obj)) {
@@ -84,7 +44,6 @@ export function DialogAddEnfantForm({
         console.log("🚀 ~ handleAction ~ error:", error);
       } finally {
         setOpen(false);
-        reloadVisibleEnfants();
       }
     }
   };
