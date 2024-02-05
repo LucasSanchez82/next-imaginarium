@@ -13,7 +13,7 @@ async function main() {
       name: "Admin",
       password,
       isAdmin: true,
-      
+      isVerified: true,
     },
   });
 }

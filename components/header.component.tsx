@@ -54,6 +54,11 @@ const Header = () => {
                     </Link>
                   </li>
                   <li>
+                    <Link href="/comptes" className="text-ct-dark-600">
+                      comptes
+                    </Link>
+                  </li>
+                  <li>
                     <Link href="/enfants" className="text-ct-dark-600">
                       enfants
                     </Link>
