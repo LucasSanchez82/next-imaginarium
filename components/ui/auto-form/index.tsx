@@ -30,6 +30,7 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   children,
   className,
   action,
+  parsedAction: parsedActionProp
 }: {
   formSchema: SchemaType;
   values?: Partial<z.infer<SchemaType>>;
@@ -39,6 +40,7 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
   fieldConfig?: FieldConfig<z.infer<SchemaType>>;
   children?: React.ReactNode;
   className?: string;
+  parsedAction?: (values: z.infer<SchemaType>) => void;
   action?: ((formData: FormData) => void) | undefined;
 }) {
   const objectFormSchema = getObjectFormSchema(formSchema);
@@ -57,12 +59,18 @@ function AutoForm<SchemaType extends ZodObjectOrWrapped>({
       onSubmitProp?.(parsedValues.data);
     }
   }
+  function onParsedAction(values: z.infer<typeof formSchema>) {
+    const parsedValues = formSchema.safeParse(values);
+    if (parsedValues.success) {
+      parsedActionProp?.(parsedValues.data);
+    }
+  }
 
   return (
     <Form {...form}>
       <form
         action={(e) => {
-          form.handleSubmit(onSubmit)();
+          form.handleSubmit(onParsedAction)();
           action && action(e);
         }}
         onSubmit={(e) => {

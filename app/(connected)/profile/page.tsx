@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { SheetChangePassword } from "./sheetChangePassword";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
@@ -12,7 +13,7 @@ export default async function Profile() {
 
     return (
       <>
-        <section className="bg-ct-blue-600  min-h-screen pt-20">
+        <section className="bg-ct-blue-600  min-h-screen pt-20 flex justify-between">
           <div className="max-w-4xl mx-auto bg-ct-dark-100 rounded-md h-[20rem] flex justify-center items-center">
             <div>
               <p className="mb-3 text-5xl text-center font-semibold">
@@ -33,6 +34,7 @@ export default async function Profile() {
                     <p className="mb-3">Name: {user.name}</p>
                     <p className="mb-3">Email: {user.email}</p>
                   </div>
+                  <SheetChangePassword />
                 </div>
               )}
             </div>

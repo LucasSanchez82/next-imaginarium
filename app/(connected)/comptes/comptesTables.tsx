@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Table,
   TableBody,
@@ -6,10 +6,12 @@ import {
   TableCell,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "@/components/ui/table";
 import { User } from "@prisma/client";
 import { DeleteDialog } from "./deleteDialog";
+import { EditEnfantFormDialog } from "./editCompteDialog";
+import { useState } from "react";
 
 export function TableCompte({ comptes }: { comptes: User[] }) {
   return (
@@ -17,13 +19,14 @@ export function TableCompte({ comptes }: { comptes: User[] }) {
       <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead>nom</TableHead>
-          <TableHead>email</TableHead>
-          <TableHead>admin</TableHead>
-          <TableHead>vérifié</TableHead>
-          <TableHead>cree le</TableHead>
-          <TableHead>mis a jour le</TableHead>
+          <TableHead>Nom</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Admin</TableHead>
+          <TableHead>Vérifié</TableHead>
+          <TableHead>Cree le</TableHead>
+          <TableHead>Mis à jour le</TableHead>
           <TableHead>Supprimer</TableHead>
+          <TableHead>Modifier</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -32,23 +35,24 @@ export function TableCompte({ comptes }: { comptes: User[] }) {
             <TableRow key={index}>
               <TableCell>{compte.name}</TableCell>
               <TableCell>{compte.email}</TableCell>
-              <TableCell>{compte.isAdmin ? "✅" : "❌"}</TableCell>
-              <TableCell>{compte.isVerified ? "✅" : "❌"}</TableCell>
+              <TableCell>{compte.isAdmin ? "🟢" : "🔴"}</TableCell>
+              <TableCell>{compte.isVerified ? "🟢" : "🔴"}</TableCell>
               <TableCell>{compte.createdAt.toLocaleString()}</TableCell>
               <TableCell>{compte.updatedAt?.toLocaleString()}</TableCell>
               <TableCell>
-                <DeleteDialog id={compte.id} />
+                <DeleteDialog
+                  id={compte.id}
+                />
+              </TableCell>
+              <TableCell>
+                <EditEnfantFormDialog
+                  compte={compte}
+                />
               </TableCell>
             </TableRow>
           );
         })}
       </TableBody>
-      {/* <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter> */}
     </Table>
   );
 }

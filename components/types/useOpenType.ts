@@ -1,0 +1,1 @@
+export type UseOpenType = {open: boolean, setOpen: (open: boolean) => void}

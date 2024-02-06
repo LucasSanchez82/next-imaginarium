@@ -1,5 +1,6 @@
 import { deleteCompteFromDb } from "@/components/actions/compte";
 import { SubmitButton } from "@/components/submitButton";
+import { UseOpenType } from "@/components/types/useOpenType";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,11 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Trash2 } from "lucide-react";
+import { useState } from "react";
 
 export function DeleteDialog({id}: {id: string}) {
   const { toast } = useToast();
+  const [open, setOpen] = useState(false);
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
           <Trash2 color="#b72424" />
@@ -29,19 +32,20 @@ export function DeleteDialog({id}: {id: string}) {
           action={async () => {
             try {
               await deleteCompteFromDb(id);
+              setOpen(false);
             } catch (error) {
               toast({
                 title:
-                  typeof error === "string"
-                    ? error
-                    : "Erreur lors de la suppression",
+                    error instanceof Error
+                    ? error.message
+                    : "Erreur Inconnu lors de la suppression",
                 variant: "destructive",
               });
             }
           }}
         >
           <DialogFooter>
-            <SubmitButton>
+            <SubmitButton classname="w-full">
               <Trash2 color="#b72424" />
             </SubmitButton>
           </DialogFooter>

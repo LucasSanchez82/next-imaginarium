@@ -7,7 +7,6 @@ export default async function Page() {
   const comptes = await prisma.user.findMany();
   return (
     <>
-      <h1>salut</h1>
       <AddEnfantFormDialog />
       <TableCompte comptes={comptes} />
     </>

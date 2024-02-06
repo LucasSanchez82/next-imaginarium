@@ -49,11 +49,6 @@ const Header = () => {
               {user.isAdmin && (
                 <>
                   <li>
-                    <Link href="/creer-compte" className="text-ct-dark-600">
-                      Creer compte
-                    </Link>
-                  </li>
-                  <li>
                     <Link href="/comptes" className="text-ct-dark-600">
                       comptes
                     </Link>
