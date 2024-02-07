@@ -10,16 +10,8 @@ import { useFormStatus } from "react-dom";
 import AutoForm from "../auto-form";
 import { toast } from "../use-toast";
 import { CategorieRadioForm } from "./categorieRadioForm";
-
-const SubmitButton = ({ children }: PropsWithChildren) => {
-  const { pending, data } = useFormStatus();
-  const value = children ?? "Ajouter";
-  return (
-    <Button aria-disabled={pending} type="submit">
-      {pending ? "..." : value}
-    </Button>
-  );
-};
+import { SubmitButton } from "@/components/submitButton";
+import { useStoreCategorie } from "@/app/(connected)/enfants/[idEnfant]/edt/useStoreCategorie";
 
 export function AddEventForm(props: {
   updateEvent: EventImpl | null;
@@ -33,6 +25,8 @@ export function AddEventForm(props: {
   categories: Categorie[];
 }) {
   const [categorie, setCategorie] = useState<string | null>(null);
+  // const {categorie: storeCategorie, setCategorie} = useStoreCategorie()
+  // const categorie: string = storeCategorie?.id ? String(storeCategorie.id) : ''
   const handleAction = async (e: FormData) => {
     const obj = Object.fromEntries(e);
     const { start, end, description, title, ...other } = obj;
@@ -69,16 +63,35 @@ export function AddEventForm(props: {
   return (
     <>
       <AutoForm
-        onValuesChange={(values) =>
-          values.start &&
-          values.end &&
-          props.setDates({
-            start: new Date(values.start),
-            end: new Date(values.end),
-          })
-        }
+        // onValuesChange={(values) =>
+        //   values.start &&
+        //   values.end &&
+        //   props.setDates({
+        //     start: new Date(values.start),
+        //     end: new Date(values.end),
+        //   })
+        // }
         formSchema={eventSchema}
-        action={handleAction}
+        // action={handleAction}
+        parsedAction={async (values) => {
+          try {
+            await props.handleAddUpdateEvent({
+              ...values,
+              id: Number(props.updateEvent?._def.publicId) || undefined,
+              idCategorie: Number(categorie) || undefined,
+            });
+          } catch (error) {
+            console.error('addEventForm', error);
+            toast({
+              title:
+                error instanceof Error
+                  ? error.message
+                  : "Erreur, impossible d'ajouter l'évènement coté serveur",
+              variant: "destructive",
+            });
+          }
+        }}
+        // onSubmit={() => console.log(categorie)}
         values={{
           title: props.updateEvent?._def.title,
           description: props.updateEvent?._def.extendedProps.description,
@@ -115,7 +128,7 @@ export function AddEventForm(props: {
         }}
       >
         <CategorieRadioForm
-          setCategorie={setCategorie}
+          setCategorie={categorie => {}}
           categories={props.categories}
         />
         <DialogFooter className=" w-full flex items-around justify-around">

@@ -45,7 +45,7 @@ export function DeleteDialog({id}: {id: string}) {
           }}
         >
           <DialogFooter>
-            <SubmitButton classname="w-full">
+            <SubmitButton className="w-full">
               <Trash2 color="#b72424" />
             </SubmitButton>
           </DialogFooter>

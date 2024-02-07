@@ -19,13 +19,14 @@ export function CategorieRadioForm({
   setCategorie,
 }: {
   categories: Categorie[];
-  setCategorie: (categories: string) => void;
+  setCategorie: (categorie: string) => void;
 }) {
   const [allCategoriesFromDb, setAllCategoriesFromDb] = useState<
     string[] | null
   >(null);
   const {categorie} = useStoreCategorie()
   useEffect(() => {
+    setCategorie(categorie?.id ? String(categorie?.id) : '')
     getCategoriesFromDb().then((categories) =>
       setAllCategoriesFromDb(categories.map((categorie) => categorie.libelle))
     );

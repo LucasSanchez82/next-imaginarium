@@ -10,9 +10,8 @@ import { cn } from "@/lib/utils";
 export function SubmitButton({
   children,
   onload,
-  classname,
-  buttonProps
-}: PropsWithChildren<{ onload?: () => any, classname?: string; buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>}>) {
+  className
+}: PropsWithChildren<ButtonHTMLAttributes<HTMLButtonElement> & { onload?: () => any}>) {
   const { pending } = useFormStatus();
   const content = children ?? "Submit";
   useEffect(() => {
@@ -22,7 +21,7 @@ export function SubmitButton({
   })
 
   return (
-    <Button {...buttonProps} className={cn("rounded cursor-pointer p-1", classname)} type="submit">
+    <Button className={cn("rounded cursor-pointer p-1", className)} type="submit">
       {pending ? "..." : content}
     </Button>
   );

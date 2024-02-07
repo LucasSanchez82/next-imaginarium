@@ -82,8 +82,8 @@ export function SheetChangePassword() {
           <SheetFooter>
             <SheetClose asChild>
               <SubmitButton
-                buttonProps={{ disabled: !!error }}
-                classname="w-full"
+                disabled={!!error}
+                className="w-full"
               >
                 {error ? (
                   <strong className="text-red-800 w-full text-center">

@@ -57,7 +57,7 @@ export function EditEnfantFormDialog({ compte }: { compte: User;}) {
           formSchema={editCompteSchema}
         >
           <DialogFooter>
-            <SubmitButton classname="w-full">Editer</SubmitButton>
+            <SubmitButton className="w-full">Editer</SubmitButton>
           </DialogFooter>
         </AutoForm>
       </DialogContent>
