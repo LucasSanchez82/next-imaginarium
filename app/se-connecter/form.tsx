@@ -2,16 +2,16 @@
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useToast } from "@/components/ui/use-toast";
 import { loginSchema } from "@/lib/schemas/authSchemas";
-import { loginType } from "@/lib/types/authTypes";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { z } from "zod";
 
 const LoginForm = () => {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const router = useRouter();
   
-  const handleSubmit = async (formValues: loginType) => {
+  const handleSubmit = async (formValues: z.infer<typeof loginSchema>) => {
     const callbackUrl = searchParams.get("callbackUrl") || "/profile"; // prend la route existante et rajoute /profile
     const res = await signIn("credentials", {
       redirect: false,

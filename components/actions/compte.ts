@@ -4,10 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import {
   addCompteSchema,
+  confirmPasswordSchema,
   editCompteSchema,
   editCompteSchemaWithId,
 } from "../zodSchemas/compteSchema";
 import { z } from "zod";
+import { authWrapper } from "./authWrapper";
+import { compare, hash } from "bcryptjs";
 
 export const addCompteToDb = async (user: FormData) => {
   const safeUser = addCompteSchema.safeParse(
@@ -32,7 +35,10 @@ export const deleteCompteFromDb = async (id: string) => {
       return "compte supprimé";
     } catch (error) {
       console.error("Erreur prisma deleteCompteFromDb() : ", error);
-      throw Error("Erreur lors de la suppression du compte en base de données", error instanceof Error ? error : undefined);
+      throw Error(
+        "Erreur lors de la suppression du compte en base de données",
+        error instanceof Error ? error : undefined
+      );
     }
   } else throw new Error("id invalide");
 };
@@ -52,5 +58,54 @@ export const editCompteToDb = async (
   } else {
     console.error("Erreur de type EditCompteToDb() : ", safeUser.error);
     throw Error("données du formulaire invalides", safeUser.error);
+  }
+};
+
+const resetPasswordProcess = async (
+  oldPassword: string,
+  newPassword: string
+) => {
+  return await authWrapper(async (session) => {
+    if (session) {
+      const oldUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { password: true },
+      });
+      if (oldUser) {
+        const passwordMatch = await compare(oldPassword, oldUser?.password);
+        console.log({
+          oldPassword,
+          oldUserDb: oldUser?.password,
+          passwordMatch,
+        });
+        if (passwordMatch) {
+          const hashedpassword = await hash(newPassword, 12);
+          await prisma.user.update({
+            where: { id: session?.user.id },
+            data: {
+              password: hashedpassword,
+            },
+          });
+          return "Mot de passe modifié avec succès";
+        } else throw Error("Mot de passe incorrect");
+      } else throw Error("Utilisateur introuvable");
+    } else throw Error("Session invalide : vous devez être connecté");
+  });
+};
+
+export const resetPassword = async (
+  data: z.infer<typeof confirmPasswordSchema>
+) => {
+  const safeData = confirmPasswordSchema.safeParse(data);
+  if (safeData.success) {
+    const { oldPassword, newPassword, confirmPassword } = safeData.data;
+    if (newPassword === confirmPassword) {
+      return await resetPasswordProcess(oldPassword, newPassword);
+    } else {
+      throw new Error("les mots de passe ne correspondent pas");
+    }
+  } else {
+    console.error("Erreur de type resetPassword() : ", safeData.error);
+    throw Error("données du formulaire invalides", safeData.error);
   }
 };

@@ -1,8 +1,8 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { Button } from "./ui/button";
-import { PropsWithChildren, use, useEffect } from "react";
+import { Button, ButtonProps } from "./ui/button";
+import { ButtonHTMLAttributes, PropsWithChildren, use, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 //
@@ -10,8 +10,9 @@ import { cn } from "@/lib/utils";
 export function SubmitButton({
   children,
   onload,
-  classname
-}: PropsWithChildren<{ onload?: () => any, classname?: string; }>) {
+  classname,
+  buttonProps
+}: PropsWithChildren<{ onload?: () => any, classname?: string; buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>}>) {
   const { pending } = useFormStatus();
   const content = children ?? "Submit";
   useEffect(() => {
@@ -21,7 +22,7 @@ export function SubmitButton({
   })
 
   return (
-    <Button className={cn("rounded cursor-pointer p-1", classname)} type="submit">
+    <Button {...buttonProps} className={cn("rounded cursor-pointer p-1", classname)} type="submit">
       {pending ? "..." : content}
     </Button>
   );

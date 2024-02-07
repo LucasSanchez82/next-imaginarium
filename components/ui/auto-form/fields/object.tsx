@@ -105,7 +105,7 @@ export default function AutoFormObject<
                   <InputComponent
                     zodInputProps={zodInputProps}
                     field={field}
-                    fieldConfigItem={fieldConfigItem}
+                    fieldConfigItem={{...fieldConfigItem, inputProps: {min: undefined, max: undefined}}}
                     label={itemName}
                     isRequired={isRequired}
                     zodItem={item}
@@ -116,6 +116,7 @@ export default function AutoFormObject<
                       value: !fieldConfigItem.inputProps?.defaultValue
                         ? field.value ?? ""
                         : undefined,
+                      
                     }}
                   />
                 </ParentElement>

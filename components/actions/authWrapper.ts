@@ -1,12 +1,7 @@
 import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+import { Session, getServerSession } from "next-auth";
 
-export const authWrapper = async <T extends Function> (fn: T) => {
+export const authWrapper = async (fn: (arg: Session | null) => any) => {
     const session = await getServerSession(authOptions);
-    if(session?.user) {
-        return fn();
-    }else{
-        console.error('AuthWrapper : Erreur, l\'utilisateur doit etre connecte');
-        throw new Error('Erreur, l\'utilisateur doit etre connecte');
-    }
+    return fn(session);
 }

@@ -21,7 +21,7 @@ export const editCompteSchemaWithId = editCompteSchema.extend({
 })
 
 export const confirmPasswordSchema = z.object({
-    oldPassword: z.string(),
-    newPassword: z.string().min(6),
-    confirmPassword: z.string().min(6),
-  }).refine(data => data.newPassword === data.confirmPassword)
+    oldPassword: z.string(required).describe('Ancien mot de passe'),
+    newPassword: z.string(required).min(6, minRequired(6)).describe('Nouveau mot de passe'),
+    confirmPassword: z.string(required).min(6, minRequired(6)).describe('Confirmation du mot de passe'),
+  })
