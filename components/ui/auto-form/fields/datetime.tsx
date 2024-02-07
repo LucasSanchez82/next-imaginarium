@@ -8,7 +8,6 @@ import {
 } from "../../form";
 import { Input } from "../../input";
 import { AutoFormInputComponentProps } from "../types";
-import { use, useEffect } from "react";
 
 export default function AutoFormDate({
   label,

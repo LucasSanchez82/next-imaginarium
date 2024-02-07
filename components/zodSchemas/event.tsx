@@ -19,8 +19,8 @@ const eventSchemaBase = z.object({
 
 const eventSchema = eventSchemaBase
   .extend({
-    start: z.date().describe("Date de début de l'événement"),
-    end: z.date().describe("Date de fin de l'événement")
+    start: z.coerce.date().describe("Date de début de l'événement"),
+    end: z.coerce.date().describe("Date de fin de l'événement")
   })
   .refine((data) => data.start < data.end, {
     message: "La date de début doit être avant la date de fin",
