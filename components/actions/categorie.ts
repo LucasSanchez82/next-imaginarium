@@ -1,7 +1,12 @@
 "use server";
 
-import { categorieSchema } from "@/app/(connected)/categorie/zodSchemas";
+import {
+  categorieSchema,
+  categorieWithIdAndTagsSchema,
+  categorieAndMiniTagsSchema,
+} from "@/app/(connected)/categorie/zodSchemas";
 import { prisma } from "@/lib/prisma";
+import { zodParserWrapper } from "@/lib/zodParserWrapper";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { authWrapper } from "./authWrapper";
@@ -37,31 +42,70 @@ const processTags = async (frontTags: string[]) => {
     ...commonsDbTags.map((tag) => ({ idTag: tag.id })),
   ];
 };
-export const upSertCategorieToDb = async (
+const parsedCategorieProcessWrapper = async (
   categorieObj: z.infer<typeof categorieSchema>,
-  id: number | undefined = undefined
+  fn: (safeCategorie: z.infer<typeof categorieSchema>) => any
 ) => {
-  const parsedCategorie = categorieSchema.safeParse(categorieObj);
-  console.log({ categorieObj });
-  if (parsedCategorie.success) {
-    const {
-      color: couleur,
-      important,
-      libelle,
-      description,
-      tags,
-    } = parsedCategorie.data;
-    const isAlreadyCategorie = await prisma.categorie.findFirst({
-      where: { libelle },
-    });
+  return await zodParserWrapper(
+    {
+      zodSchema: categorieSchema,
+      toParse: categorieObj,
+      error: "le type de categorie est incorrecte",
+    },
+    fn
+  );
+};
+const parsedEditCategorieProcessWrapper = async (
+  {
+    categorieObjNew,
+    categorieObjOld,
+  }: {
+    categorieObjOld: z.infer<typeof categorieWithIdAndTagsSchema>;
+    categorieObjNew: z.infer<typeof categorieAndMiniTagsSchema>;
+  },
+  fn: (safeCategories: {
+    categorieObjOld: z.infer<typeof categorieWithIdAndTagsSchema>;
+    categorieObjNew: z.infer<typeof categorieAndMiniTagsSchema>;
+  }) => any
+) => {
+  return await zodParserWrapper(
+    {
+      toParse: categorieObjOld,
+      zodSchema: categorieWithIdAndTagsSchema,
+      error: "La type de [ancienne categorie] est invalide",
+    },
+    async (safeCategorieOld) => {
+      return await zodParserWrapper(
+        {
+          toParse: categorieObjNew,
+          zodSchema: categorieAndMiniTagsSchema,
+          error: "La type de [nouvelle categorie] est invalide",
+        },
+        async (safeCategorieNew) => {
+          return await fn({
+            categorieObjOld: safeCategorieOld,
+            categorieObjNew: safeCategorieNew,
+          });
+        }
+      );
+    }
+  );
+};
+export const addCategorieToDb = async (
+  categorieObj: z.infer<typeof categorieSchema>
+) => {
+  return parsedCategorieProcessWrapper(
+    categorieObj,
+    async ({ color: couleur, important, libelle, tags, description }) => {
+      const isAlreadyCategorie = await prisma.categorie.findFirst({
+        where: { libelle },
+      });
       const frontTags = tags.map((tag) => tag.libelle);
       const reliedTags = await processTags(frontTags);
-      console.log({isAlreadyCategorie, id: !!id})
-      if (!isAlreadyCategorie || id) {
+      if (!isAlreadyCategorie) {
         try {
-          const createdCategorie = await prisma.categorie.upsert({
-            where: {id, libelle: id ? undefined : libelle},
-            create: {
+          const createdCategorie = await prisma.categorie.create({
+            data: {
               couleur,
               important,
               libelle,
@@ -72,20 +116,6 @@ export const upSertCategorieToDb = async (
                 },
               },
             },
-            update: {
-              couleur,
-              important,
-              libelle,
-              description,
-              // tags: {
-              //   updateMany: [
-              //     {
-              //       data: { idTag: reliedTags[0].idTag },
-              //       where: {  },
-              //     }
-              //   ],
-              // },
-            }
           });
           revalidatePath("/categorie");
           return `Categorie ${createdCategorie.libelle} ajouté avec succès`;
@@ -94,9 +124,80 @@ export const upSertCategorieToDb = async (
           throw Error("Erreur Serveur lors de l'ajoût de la categorie");
         }
       } else throw Error("La categorie existe déjà");
-  } else {
-    throw Error("le type de categorie est incorrecte", parsedCategorie.error);
-  }
+    }
+  );
+};
+
+export const editCategorieInDb = async (
+  categorieObjOld: z.infer<typeof categorieWithIdAndTagsSchema>,
+  categorieNew: z.infer<typeof categorieAndMiniTagsSchema>
+) => {
+  return await parsedEditCategorieProcessWrapper(
+    { categorieObjOld: categorieObjOld, categorieObjNew: categorieNew }, //passed unSafed data
+    async ({
+      categorieObjOld: safeCategorieOld,
+      categorieObjNew: safeCategorieNew,
+    }) => {
+      const existingCategorie = await prisma.categorie.findFirst({
+        where: {
+          id: safeCategorieOld.id,
+          libelle: safeCategorieOld.libelle,
+        },
+        include: { tags: { include: { tag: true } } },
+      });
+      if (existingCategorie) {
+        const deletedTagsValues: { libelle: string; id: number }[] = [];
+        const sameTagsValues: string[] = [];
+        const createdtagsValues: string[] = safeCategorieNew.tags.filter(
+          (tag) =>
+            existingCategorie.tags.every(
+              (existingtag) => existingtag.tag.libelle !== tag
+            )
+        );
+        existingCategorie.tags.forEach((existingtag) => {
+          if (
+            safeCategorieNew.tags.every(
+              (newTag) => newTag !== existingtag.tag.libelle
+            )
+          ) {
+            deletedTagsValues.push({
+              libelle: existingtag.tag.libelle,
+              id: existingtag.tag.id,
+            });
+          } else {
+            sameTagsValues.push(existingtag.tag.libelle);
+          }
+        });
+
+        try {
+          const updatedCategorie = await prisma.categorie.update({
+            where: { id: existingCategorie.id },
+            data: {
+              couleur: safeCategorieNew.couleur,
+              important: safeCategorieNew.important,
+              libelle: safeCategorieNew.libelle,
+              description: safeCategorieNew.description,
+              tags: {
+                createMany: {
+                  data: await processTags(createdtagsValues),
+                },
+                deleteMany: [
+                  ...deletedTagsValues.map((tag) => ({
+                    idTag: tag.id,
+                    idCategorie: existingCategorie.id,
+                  })),
+                ],
+              },
+            },
+          });
+          revalidatePath("/categorie");
+        } catch (error) {
+          console.error("🚀 ~ editCategorieInDb ~ error:", error);
+          throw Error("Erreur Serveur lors de la modification de la categorie");
+        }
+      } else throw Error("Categorie introuvable");
+    }
+  );
 };
 
 export const getCategoriesFromDb = async () => {

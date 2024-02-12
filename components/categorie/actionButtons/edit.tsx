@@ -1,21 +1,20 @@
 "use client";
 import { categorieSchema } from "@/app/(connected)/categorie/zodSchemas";
+import { editCategorieInDb } from "@/components/actions/categorie";
 import { SubmitButton } from "@/components/submitButton";
 import AutoForm from "@/components/ui/auto-form";
 import { Button } from "@/components/ui/button";
-import { Categorie, CategorieTag, Tag } from "@prisma/client";
 import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from "@/components/ui/dialog";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { Categorie, CategorieTag, Tag } from "@prisma/client";
 import { Edit } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { upSertCategorieToDb } from "@/components/actions/categorie";
 
 const EditCategorieButton = ({
   categorie,
@@ -23,7 +22,7 @@ const EditCategorieButton = ({
   categorie: Categorie & { tags: (CategorieTag & { tag: Tag })[] };
 }) => {
   const [open, setOpen] = useState(false);
-  const {toast} = useToast()
+  const { toast } = useToast();
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -36,20 +35,38 @@ const EditCategorieButton = ({
           <DialogTitle>Modifier la categorie : {categorie.libelle}</DialogTitle>
         </DialogHeader>
         <AutoForm
-        parsedAction={async (categorieObj) => {
+          parsedAction={async (categorieObj) => {
             try {
-                await upSertCategorieToDb(categorieObj, categorie.id)
-                setOpen(false)
-            } catch(error) {
-                toast({
-                    title: "Erreur",
-                    description: error instanceof Error ? error.message: "Erreur inconnue lors de la modification de la categorie",
-                    variant: 'destructive'
-                
-                })
+              await editCategorieInDb(categorie, {
+                couleur: categorieObj.color,
+                important: categorieObj.important,
+                libelle: categorieObj.libelle,
+                description: categorieObj.description,
+                tags: categorieObj.tags.map((tag) => tag.libelle),
+              });
+              // setOpen(false)
+            } catch (error) {
+              toast({
+                title: "Erreur",
+                description:
+                  error instanceof Error
+                    ? error.message
+                    : "Erreur inconnue lors de la modification de la categorie",
+                variant: "destructive",
+              });
             }
-        }}
+          }}
           formSchema={categorieSchema}
+          fieldConfig={{
+            color: {
+              inputProps: {
+                type: "color",
+              }
+            },
+            important: {
+              fieldType: "switch",
+            },
+          }}
           values={{
             color: categorie.couleur || undefined,
             description: categorie.description || undefined,
@@ -58,7 +75,7 @@ const EditCategorieButton = ({
             tags: categorie.tags.map((tag) => ({ libelle: tag.tag.libelle })),
           }}
         >
-            <SubmitButton className="w-full">Modifier</SubmitButton>
+          <SubmitButton className="w-full">Modifier</SubmitButton>
         </AutoForm>
       </DialogContent>
     </Dialog>

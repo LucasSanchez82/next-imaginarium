@@ -1,6 +1,6 @@
 "use client";
 
-import { upSertCategorieToDb } from "@/components/actions/categorie";
+import { addCategorieToDb } from "@/components/actions/categorie";
 import AutoForm from "@/components/ui/auto-form";
 import { Button } from "@/components/ui/button";
 import { categorieSchema } from "./zodSchemas";
@@ -14,7 +14,7 @@ const FormCategorie = ({ className }: { className?: string }) => {
       // action={addCategorieToDb}
       parsedAction={async (values) => {
         try {
-          await upSertCategorieToDb(values);
+          await addCategorieToDb(values);
         } catch (error) {
           console.error("FormCategorie", error);
           toast({
