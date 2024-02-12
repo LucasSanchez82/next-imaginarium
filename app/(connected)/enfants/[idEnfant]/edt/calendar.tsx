@@ -4,7 +4,7 @@ import {
   deleteEvenementToDb,
   updateEvenementToDb,
 } from "@/components/actions/edt";
-import { AddEventModal } from "@/components/ui/edt/addEventModal";
+import { AddEventModal } from "@/components/edt/addEventModal";
 import { useToast } from "@/components/ui/use-toast";
 import { CalendarEvent } from "@/components/zodSchemas/event";
 import {

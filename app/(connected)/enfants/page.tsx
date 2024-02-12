@@ -1,5 +1,5 @@
 import { getSpecificEnfants } from "@/components/actions/enfant";
-import { TableEnfant } from "@/components/dataTableComponent";
+import { TableEnfant } from "@/components/enfants/tableEnfant";
 import { configRequestEnfantPrismaType } from "@/types/enfantType";
 const page = async ({
   searchParams,

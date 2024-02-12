@@ -6,8 +6,8 @@ import { EventImpl } from "@fullcalendar/core/internal";
 import { Categorie } from "@prisma/client";
 import { Trash2 } from "lucide-react";
 import { useState } from "react";
-import AutoForm from "../auto-form";
-import { toast } from "../use-toast";
+import AutoForm from "../ui/auto-form";
+import { toast } from "../ui/use-toast";
 import { CategorieRadioForm } from "./categorieRadioForm";
 
 export function AddEventForm(props: {

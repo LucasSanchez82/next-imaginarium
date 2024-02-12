@@ -13,7 +13,7 @@ import { dateResetOffset } from "@/lib/dateUtils";
 import { EventImpl } from "@fullcalendar/core/internal";
 import { Categorie, Evenement } from "@prisma/client";
 import { useEffect } from "react";
-import { toast } from "../use-toast";
+import { toast } from "../ui/use-toast";
 import { AddEventForm } from "./AddEventForm";
 
 export function AddEventModal({

@@ -70,22 +70,41 @@ model Evenement {
   titre       String   @db.TinyText
   description String?
 
-  idJour   Int
-  idEnfant Int
+  idJour      Int
+  idEnfant    Int
   idCategorie Int?
 
-  enfant Enfant  @relation(fields: [idEnfant], references: [id])
-  jour   EdtJour @relation(fields: [idJour], references: [id])
+  enfant    Enfant     @relation(fields: [idEnfant], references: [id])
+  jour      EdtJour    @relation(fields: [idJour], references: [id])
   categorie Categorie? @relation(fields: [idCategorie], references: [id])
 }
 
 model Categorie {
   id          Int     @id @default(autoincrement())
-  libelle     String @unique
+  libelle     String  @unique
   description String?
   couleur     String?
   important   Boolean @default(false)
 
   evenements Evenement[]
+  tags       CategorieTag[]
 }
-// ...
+
+model CategorieTag {
+  idCategorie Int
+  idTag       Int
+
+  tag       Tag       @relation(fields: [idTag], references: [id])
+  categorie Categorie @relation(fields: [idCategorie], references: [id])
+
+  @@id([idCategorie, idTag])
+}
+
+model Tag {
+  id          Int     @id @default(autoincrement())
+  libelle     String  @unique
+  description String?
+  couleur     String?
+
+  categories CategorieTag[]
+}

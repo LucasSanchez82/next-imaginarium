@@ -14,9 +14,9 @@ import {
 import { configRequestEnfantPrismaType, getEnfant } from "@/types/enfantType";
 import Link from "next/link";
 import { useState } from "react";
-import { deleteEnfantServer } from "./actions/enfant";
-import { SubmitButton } from "./submitButton";
-import { useToast } from "./ui/use-toast";
+import { deleteEnfantServer } from "../actions/enfant";
+import { SubmitButton } from "../submitButton";
+import { useToast } from "../ui/use-toast";
 
 export function TableEnfant({
   enfants,

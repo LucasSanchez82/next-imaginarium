@@ -5,7 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "edge",
+            "name": "Edge",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "vcCode Edge DevTools",
             "request": "launch",
             "type": "vscode-edge-devtools.debug",
             "url": "http://localhost:3000",

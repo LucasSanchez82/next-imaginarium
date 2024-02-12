@@ -12,4 +12,7 @@ export const categorieSchema = z.object({
     .default("#3788d8")
     .describe("couleur"),
   important: z.coerce.boolean().default(false).describe("important"),
+  tags: z.array(z.object({
+    libelle: z.string().describe("libelle").toLowerCase(),
+  })),
 });

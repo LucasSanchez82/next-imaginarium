@@ -1,14 +1,31 @@
 "use client";
 
-import { addCategorieToDb } from "@/components/actions/categorie";
+import { upSertCategorieToDb } from "@/components/actions/categorie";
 import AutoForm from "@/components/ui/auto-form";
 import { Button } from "@/components/ui/button";
 import { categorieSchema } from "./zodSchemas";
+import { useToast } from "@/components/ui/use-toast";
+import { SubmitButton } from "@/components/submitButton";
 
-const FormCategorie= ({ className }: { className?: string }) => {
+const FormCategorie = ({ className }: { className?: string }) => {
+  const { toast } = useToast();
   return (
     <AutoForm
-      action={addCategorieToDb}
+      // action={addCategorieToDb}
+      parsedAction={async (values) => {
+        try {
+          await upSertCategorieToDb(values);
+        } catch (error) {
+          console.error("FormCategorie", error);
+          toast({
+            title:
+              error instanceof Error
+                ? error.message
+                : "Erreur, impossible d'ajouter la catégorie coté serveur",
+            variant: "destructive",
+          });
+        }
+      }}
       className={className}
       formSchema={categorieSchema}
       fieldConfig={{
@@ -25,7 +42,7 @@ const FormCategorie= ({ className }: { className?: string }) => {
         },
       }}
     >
-      <Button type="submit">Envoyer</Button>
+      <SubmitButton>Ajouter</SubmitButton>
     </AutoForm>
   );
 };

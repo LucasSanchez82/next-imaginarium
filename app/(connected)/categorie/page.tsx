@@ -1,20 +1,31 @@
-import React from "react";
+import React, { StyleHTMLAttributes } from "react";
 import FormCategorie from "./form";
 import { prisma } from "@/lib/prisma";
+import { CategorieItem } from "../../../components/categorie/categorieItem";
 
 const page = async () => {
-  const categories = await prisma.categorie.findMany();
-  return <>
-  <FormCategorie />
-  <h2>Categories : </h2>
-  <ul>
-    {categories.map((categorie) => (
-      <li key={categorie.id} className={`rounded p-1 m-1 ${categorie.important && 'underline'}`} style={{backgroundColor: categorie.couleur ?? '#3788d8'}} >
-        {categorie.libelle} : {categorie.description}
-      </li>
-    ))}
-  </ul>
-  </>;
+  const categories = await prisma.categorie.findMany({include: {tags: {include: {tag: true}}}});
+  console.log(categories[2].tags)
+  return (
+    <>
+      <FormCategorie />
+      <h2>Categories : </h2>
+      <ul className="flex justify-around items-center flex-wrap">
+        {categories.map((categorie) => {
+          const backgroundColor: React.CSSProperties = {
+            backgroundColor: categorie.couleur ?? "#3788d8",
+          };
+          return (
+            <CategorieItem
+              key={categorie.id}
+              categorie={categorie}
+              backgroundColor={backgroundColor}
+            />
+          );
+        })}
+      </ul>
+    </>
+  );
 };
 
 export default page;
