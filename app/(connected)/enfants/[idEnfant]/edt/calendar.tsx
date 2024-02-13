@@ -143,7 +143,6 @@ function Calendar({
             dateFin: dates.end,
             description,
             titre,
-            idCategorie,
           },
           "/(connected)/enfants/[idEnfant]/edt/"
         );
