@@ -93,7 +93,7 @@ export const addEvenementToDb = async (
 };
 
 export const updateEvenementToDb = async (
-  evenement: Omit<Evenement, "idEnfant" | "idJour">,
+  evenement: Omit<Evenement, "idEnfant" | "idJour" | 'idCategorie'> & {idCategorie?: null | number},
   path?: string
 ) => {
   try {
