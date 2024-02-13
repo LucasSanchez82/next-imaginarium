@@ -33,6 +33,11 @@
     --ring: 222.2 84% 4.9%;
  
     --radius: 0.5rem;
+
+    /* fullcalendar */
+
+    --fc-list-event-dot-width: 10px;
+    --fc-list-event-hover-bg-color: #2c3e50;
   }
  
   .dark {
@@ -78,8 +83,10 @@
 .fc-toolbar-title {
   text-transform: capitalize;
 }
-
-
+.fc-theme-standard .fc-list-day-cushion {
+  background-color: #2c3e50;
+  color: white;
+}
 td, th {
   text-align: center;
 }

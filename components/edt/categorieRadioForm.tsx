@@ -55,8 +55,8 @@ export function CategorieRadioForm({
                         <FormControl>
                           <RadioGroupItem value={String(categorie.id)} />
                         </FormControl>
-                        <FormLabel className="font-normal">
-                          {categorie.libelle} {(categorie.important && '⚠️')}
+                        <FormLabel className="font-normal flex items-center">
+                          <div className="rounded w-2 h-2 mr-1" style={{backgroundColor: categorie.couleur || '#3788d8'}}></div> <div>{categorie.libelle} {(categorie.important && '⚠️')}</div>
                         </FormLabel>
                       </FormItem>
                     ))
