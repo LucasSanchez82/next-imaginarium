@@ -17,10 +17,29 @@ export const addCompteToDb = async (user: FormData) => {
     Object.fromEntries(user.entries())
   );
   if (safeUser.success) {
-    const compte = await prisma.user.create({ data: safeUser.data });
-    console.log(compte);
-    revalidatePath("/comptes");
-    return `${compte.name} a bien été ajouté`;
+    let hashedPassword: string | null = null;
+    try{
+      hashedPassword = await hash(safeUser.data.password, 12);
+    }catch(error){
+      console.error("Erreur bcrypt addCompteToDb() : ", error);
+      throw Error(
+        "Erreur lors du hashage du mot de passe",
+        error instanceof Error ? error : undefined
+      );
+    }
+    if(hashedPassword){
+      try{
+        const compte = await prisma.user.create({ data: {...safeUser.data, password: hashedPassword} });
+        revalidatePath("/comptes");
+        return `${compte.name} a bien été ajouté`;
+      }catch(error){
+        console.error("Erreur prisma addCompteToDb() : ", error);
+        throw Error(
+          "Erreur lors de l'ajout du compte en base de données",
+          error instanceof Error ? error : undefined
+        );
+      }
+    }else throw Error("Mot de passe hashé null");
   } else {
     console.error("Erreur de type AddCompteToDb() : ", safeUser.error);
     throw Error("données du formulaire invalides", safeUser.error);
