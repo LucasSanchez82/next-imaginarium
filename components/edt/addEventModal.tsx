@@ -80,21 +80,30 @@ export function AddEventModal({
       } = values;
       if (id) {
         // * UPDATE
-        updateEvent.setProp("title", values.title);
-        updateEvent.setExtendedProp("description", values.description);
-        updateEvent.setStart(values.start);
-        updateEvent.setEnd(values.end);
-        const updatedEvent = await updateEvenementToDb(
-          {
-            dateDebut,
-            dateFin,
-            titre,
-            id,
-            description: values.description || null,
-            idCategorie: idCategorie || null,
-          },
-          "/(connected)/enfants/[idEnfant]/edt/"
-        );
+        updateEvent.setProp("title", titre);
+        updateEvent.setExtendedProp("description", description);
+        updateEvent.setStart(dateDebut);
+        updateEvent.setEnd(dateFin);
+        try{
+          const updatedEvent = await updateEvenementToDb(
+            {
+              dateDebut,
+              dateFin,
+              titre,
+              id,
+              description: description || null,
+              idCategorie: idCategorie || null,
+            },
+            "/(connected)/enfants/[idEnfant]/edt/"
+          );
+        }catch(error){
+          console.error(error);
+          toast({
+            title: "Erreur base de données",
+            description: error instanceof Error && error.message,
+            variant: "destructive",
+          });
+        }
       } else {
         toast({
           title: "Erreur",
