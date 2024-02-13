@@ -44,7 +44,7 @@ const EditCategorieButton = ({
                 description: categorieObj.description,
                 tags: categorieObj.tags.map((tag) => tag.libelle),
               });
-              // setOpen(false)
+              setOpen(false)
             } catch (error) {
               toast({
                 title: "Erreur",
