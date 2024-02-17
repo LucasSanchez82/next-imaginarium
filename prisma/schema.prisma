@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -28,10 +28,10 @@ model User {
 
 model Enfant {
   id            Int      @id @default(autoincrement())
-  nom           String   @db.TinyText
-  prenom        String   @db.TinyText
+  nom           String 
+  prenom        String   
   telephone     String?
-  email         String?
+  email         String? @unique
   dateNaissance DateTime @db.Timestamp()
   idReferent    String
 
@@ -67,7 +67,7 @@ model Evenement {
   id          Int      @id @default(autoincrement())
   dateDebut   DateTime @db.Timestamp()
   dateFin     DateTime @default(now()) @db.Timestamp()
-  titre       String   @db.TinyText
+  titre       String  
   description String?
 
   idJour      Int

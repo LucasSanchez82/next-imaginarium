@@ -4,8 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { CategorieItem } from "../../../components/categorie/categorieItem";
 
 const page = async () => {
-  const categories = await prisma.categorie.findMany({include: {tags: {include: {tag: true}}}});
-  console.log(categories[2].tags)
+    const categories = await prisma.categorie.findMany({include: {tags: {include: {tag: true}}}});
   return (
     <>
       <FormCategorie />

@@ -1,4 +1,5 @@
 "use client";
+import { SubmitButton } from "@/components/submitButton";
 import AutoForm, { AutoFormSubmit } from "@/components/ui/auto-form";
 import { useToast } from "@/components/ui/use-toast";
 import { loginSchema } from "@/lib/schemas/authSchemas";
@@ -10,7 +11,7 @@ const LoginForm = () => {
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const router = useRouter();
-  
+
   const handleSubmit = async (formValues: z.infer<typeof loginSchema>) => {
     const callbackUrl = searchParams.get("callbackUrl") || "/profile"; // prend la route existante et rajoute /profile
     const res = await signIn("credentials", {
@@ -31,15 +32,19 @@ const LoginForm = () => {
     }
   };
   return (
-      <AutoForm formSchema={loginSchema} onSubmit={handleSubmit} fieldConfig={{
+    <AutoForm
+      formSchema={loginSchema}
+      parsedAction={handleSubmit}
+      fieldConfig={{
         password: {
           inputProps: {
-            type: 'password'
-          }
-        }
-      }}>
-        <AutoFormSubmit>Se connecter</AutoFormSubmit>
-      </AutoForm>
+            type: "password",
+          },
+        },
+      }}
+    >
+      <SubmitButton>Se connecter</SubmitButton>
+    </AutoForm>
   );
 };
 
