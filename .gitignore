@@ -38,4 +38,3 @@ next-env.d.ts
 .env
 prisma/migrations
 upload/dossierEnfant/*
-postgres-data/*
