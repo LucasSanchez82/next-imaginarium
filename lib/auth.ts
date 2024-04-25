@@ -3,12 +3,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compare } from "bcryptjs";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
 import { sessionSchema } from "./schemas/authSchemas";
 import { sessionType } from "./types/authTypes";
-
-
 
 export const authOptions: NextAuthOptions = {
   // This is a temporary fix for prisma client.
@@ -48,29 +44,31 @@ export const authOptions: NextAuthOptions = {
         if (!user || !isPasswordOk) {
           return null;
         }
-        
+
         const newSession = {
           id: user.id!, //obliger de mettre id
           email: user.email!,
           name: user.name!,
           isAdmin: Boolean(user.isAdmin),
           isVerified: Boolean(user.isVerified),
-        }
+        };
         const safeNewSession = sessionSchema.safeParse(newSession);
 
-        if(safeNewSession.success){
+        if (safeNewSession.success) {
           return safeNewSession.data; //j'envoi les donnees qui sont safes et donc suite dans jwt..
-
-        }else {
-          console.error('error auth options, credential provider safeparse session : ', safeNewSession.error)
+        } else {
+          console.error(
+            "error auth options, credential provider safeparse session : ",
+            safeNewSession.error
+          );
           return null;
         }
-
       },
     }),
   ],
   callbacks: {
-    jwt: ({ token, user, profile, isNewUser }) => {    //token recupere ce qui a ete retourne par le provider   
+    jwt: ({ token, user, profile, isNewUser }) => {
+      //token recupere ce qui a ete retourne par le provider
       // je destructure sinon les variables sont undefined
       // je luis dis tkt t es un sessionType (j'ai menti en vrai on sait pas) du coup je verifie quand meme apres
       // avec safeParse
@@ -81,18 +79,22 @@ export const authOptions: NextAuthOptions = {
         isAdmin: customToken.isAdmin,
         isVerified: customToken.isVerified,
         id: customToken.id,
-      }
+      };
 
       const safeNewSession = sessionSchema.safeParse(newSession);
       if (safeNewSession.success) {
-        return safeNewSession.data
-      }else {
-        throw Error('autOPtions jwt type Error : \nZodError : ' + safeNewSession.error.message)
+        return safeNewSession.data;
+      } else {
+        throw Error(
+          "autOPtions jwt type Error : \nZodError : " +
+            safeNewSession.error.message
+        );
       }
     },
-    session: ({ session, user, token }) => { //token recuperer ce qu a retourner jwt
-      const safeToken = sessionSchema.safeParse(token)
-      if(safeToken.success){
+    session: ({ session, user, token }) => {
+      //token recuperer ce qu a retourner jwt
+      const safeToken = sessionSchema.safeParse(token);
+      if (safeToken.success) {
         return {
           ...session,
           user: {
@@ -100,10 +102,12 @@ export const authOptions: NextAuthOptions = {
             ...safeToken.data,
           },
         };
-      }else {
-        throw Error('aut Options session():\nErreur de types:\nZodError: ' + safeToken.error.message);
+      } else {
+        throw Error(
+          "aut Options session():\nErreur de types:\nZodError: " +
+            safeToken.error.message
+        );
       }
-
     },
   },
 };
